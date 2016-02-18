@@ -1,0 +1,24 @@
+{
+  "name": "",
+  "version": "0.0.0",
+  "dependencies": {},
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.3.1",
+    "gulp-coffee": "^2.3.1",
+    "gulp-sass": "^2.2.0",
+    "gulp-util": "^3.0.7",
+    "gulp-webserver": "^0.9.1",
+    "jasmine-core": "^2.4.1",
+    "karma": "^0.13.21",
+    "karma-coffee-preprocessor": "^0.3.0",
+    "karma-jasmine": "^0.3.7",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "karma-spec-reporter": "0.0.24",
+    "phantomjs-prebuilt": "^2.1.4",
+    "tiny-lr": "^0.2.1"
+  }
+}
