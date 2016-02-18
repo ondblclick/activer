@@ -39,7 +39,7 @@ gulp.task('default', ['clean'], function() {
 
 gulp.task('server', ['watch'], function() {
   gulp.src('./dist')
-    .pipe(server({ livereload: true, open: true}));
+    .pipe(server({ livereload: true, open: true }));
 });
 
 gulp.task('test', function (done) {
