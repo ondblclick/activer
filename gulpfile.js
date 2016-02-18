@@ -3,8 +3,8 @@ var coffee = require ('gulp-coffee');
 var sass = require ('gulp-sass');
 var gutil = require ('gulp-util');
 var clean = require('gulp-clean');
-var webserver = require('gulp-webserver');
-var karmaServer = require('karma').Server;
+var server = require('gulp-webserver');
+var KarmaServer = require('karma').Server;
 
 gulp.task('styles', function() {
   return gulp.src('./app/stylesheets/*.scss')
@@ -39,11 +39,11 @@ gulp.task('default', ['clean'], function() {
 
 gulp.task('server', ['watch'], function() {
   gulp.src('./dist')
-    .pipe(webserver({ livereload: true, open: true}));
+    .pipe(server({ livereload: true, open: true}));
 });
 
 gulp.task('test', function (done) {
-  new karmaServer({
+  new KarmaServer({
     configFile: __dirname + '/karma.conf.js',
     singleRun: true
   }, done).start();
