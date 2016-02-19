@@ -9,7 +9,7 @@ class @Model
     @addAssociations()
     @constructor.collection = @constructor.collection or []
     utils.keys(properties).forEach (key) =>
-      @[key] = properties[key] if utils.indexOf(@fields, key) isnt -1
+      @[key] = properties[key] if @fields.indexOf(key) isnt -1
     @constructor.collection.push @
 
   addFields: ->

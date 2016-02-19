@@ -16,8 +16,6 @@ utils =
     return [] unless obj
     Object.keys(obj)
 
-  indexOf: (array, item) -> array.indexOf(item)
-
   idCounter: 0
 
   uniqueId: (prefix) ->
