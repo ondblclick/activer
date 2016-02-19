@@ -6,4 +6,4 @@ class @Collection extends Array
     props = props or {}
     obj = {}
     obj["#{@parent.constructor.name.toLowerCase()}_id"] = @parent.id
-    @model.create(_.extend(props, obj))
+    @model.create(utils.extend(props, obj))

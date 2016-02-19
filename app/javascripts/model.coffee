@@ -1,22 +1,22 @@
 class @Model
   @all: -> @collection or []
   @find: (id) -> @where({ id: id })[0]
-  @where: (props) -> _.where(@all(), props)
+  @where: (props) -> utils.where(@all(), props)
   @create: (props) -> new @(props)
 
   constructor: (properties) ->
     @addFields()
     @addAssociations()
     @constructor.collection = @constructor.collection or []
-    _.keys(properties).forEach (key) =>
-      @[key] = properties[key] if _.indexOf(@fields, key) isnt -1
+    utils.keys(properties).forEach (key) =>
+      @[key] = properties[key] if utils.indexOf(@fields, key) isnt -1
     @constructor.collection.push @
 
   addFields: ->
     @fields = @fields || []
     @fields.forEach (field) => @[field] = null
     @fields.push('id')
-    @.id = _.uniqueId("#{@constructor.name.toLowerCase()}_")
+    @id = utils.uniqueId("#{@constructor.name.toLowerCase()}_")
 
   addAssociations: ->
     @addBelongsToAssociation() if !!@belongsTo
@@ -30,7 +30,7 @@ class @Model
 
       @["#{model.name.toLowerCase()}_id"] = null
       @fields.push("#{model.name.toLowerCase()}_id")
-      @fields = _.uniq(@fields)
+      @fields = utils.uniq(@fields)
 
   addHasManyAssociation: ->
     @hasMany().forEach (model) =>
@@ -49,4 +49,4 @@ class @Model
       @["create#{model.name}"] = (props = {}) =>
         obj = {}
         obj["#{@constructor.name.toLowerCase()}_id"] = @id
-        model.create(_.extend(props, obj))
+        model.create(utils.extend(props, obj))

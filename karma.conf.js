@@ -22,7 +22,6 @@ module.exports = function(config) {
     },
 
     files: [
-      'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js',
       './app/javascripts/*.coffee',
       './spec/*.coffee'
     ]
