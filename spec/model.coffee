@@ -9,6 +9,11 @@ describe 'Model', ->
     hasOne: -> [Author]
     hasMany: -> [Comment]
 
+  beforeEach ->
+    Post.collection = []
+    Comment.collection = []
+    Author.collection = []
+
   describe 'adds useful properties', ->
     it 'for class with belongsTo method implemented', ->
       post = Post.create()
@@ -43,3 +48,29 @@ describe 'Model', ->
       expect(post.comments().length).toEqual 0
       post.comments().create()
       expect(post.comments().length).toEqual 1
+
+  describe 'adds useful static method', ->
+    it '#all', ->
+      [1..10].forEach -> Post.create()
+      expect(Post.all().length).toEqual 10
+
+    it '#find', ->
+      [1..10].forEach (index) -> Post.create({ id: index })
+      expect(Post.find(1)).toBeDefined()
+      expect(Post.find(15)).toBeUndefined()
+
+    it '#where', ->
+      [1..10].forEach (index) -> Post.create({ id: index })
+      expect(Post.where({ id: 1 }).length).toEqual 1
+      expect(Post.where({ id: 20 }).length).toEqual 0
+
+    it '#create', ->
+      expect(Post.collection).toEqual []
+      post = Post.create()
+      expect(Post.collection).toEqual [post]
+
+    it '#deleteAll', ->
+      [1..10].forEach -> Post.create()
+      expect(Post.all().length).toEqual 10
+      Post.deleteAll()
+      expect(Post.all().length).toEqual 0
