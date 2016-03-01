@@ -5,7 +5,6 @@ utils =
         dest[key] = value
     dest
 
-  # TODO: clean this method up
   where: (arr, attrs) ->
     res = []
     arr.forEach (object) ->
@@ -13,6 +12,12 @@ utils =
       for key, value of attrs
         all = false if object[key] isnt value
       res.push object if all
+    res
+
+  filter: (arr, predicate) ->
+    res = []
+    arr.forEach (object) ->
+      res.push object if predicate(object)
     res
 
   keys: (obj) ->

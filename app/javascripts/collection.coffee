@@ -7,3 +7,7 @@ class @Collection extends Array
     obj = {}
     obj["#{@parent.constructor.name.toLowerCase()}_id"] = @parent.id
     @model.create(utils.extend(props, obj))
+
+  deleteAll: =>
+    @model.collection = utils.filter @model.collection, (object) =>
+      @indexOf(object) is -1

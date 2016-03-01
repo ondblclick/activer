@@ -28,9 +28,15 @@ describe 'Model', ->
       post = Post.create()
       comment1 = Comment.create({ post_id: post.id })
       comment2 = Comment.create({ post_id: post.id })
+      comment3 = Comment.create()
+      expect(Comment.all().length).toEqual 3
       expect(post.comments().length).toEqual 2
       expect(post.comments()[0]).toEqual comment1
       expect(post.comments()[1]).toEqual comment2
+      post.comments().deleteAll()
+      expect(post.comments()[0]).toEqual undefined
+      expect(post.comments()[1]).toEqual undefined
+      expect(Comment.all().length).toEqual 1
 
     it 'for collection returned by hasMany association method', ->
       post = Post.create()

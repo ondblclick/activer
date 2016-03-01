@@ -3,6 +3,7 @@ class @Model
   @find: (id) -> @where({ id: id })[0]
   @where: (props) -> utils.where(@all(), props)
   @create: (props) -> new @(props)
+  @deleteAll: -> @collection = []
 
   initialize: ->
 
