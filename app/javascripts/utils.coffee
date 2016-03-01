@@ -5,6 +5,7 @@ utils =
         dest[key] = value
     dest
 
+  # TODO: clean this method up
   where: (arr, attrs) ->
     res = []
     arr.forEach (object) ->

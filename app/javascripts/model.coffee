@@ -4,19 +4,27 @@ class @Model
   @where: (props) -> utils.where(@all(), props)
   @create: (props) -> new @(props)
 
+  initialize: ->
+
   constructor: (properties) ->
     @addFields()
     @addAssociations()
     @constructor.collection = @constructor.collection or []
     utils.keys(properties).forEach (key) =>
       @[key] = properties[key] if @fields.indexOf(key) isnt -1
+    @id = utils.uniqueId("#{@constructor.name.toLowerCase()}_") unless @id
     @constructor.collection.push @
+    @initialize()
+
+  destroy: ->
+    index = @constructor.collection.indexOf(@)
+    @constructor.collection.splice(index, 1) unless index is -1
 
   addFields: ->
     @fields = @fields || []
     @fields.forEach (field) => @[field] = null
     @fields.push('id')
-    @id = utils.uniqueId("#{@constructor.name.toLowerCase()}_")
+    @fields = utils.uniq(@fields)
 
   addAssociations: ->
     @addBelongsToAssociation() if !!@belongsTo
