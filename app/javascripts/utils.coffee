@@ -8,8 +8,10 @@ utils =
   where: (arr, attrs) ->
     res = []
     arr.forEach (object) ->
+      all = true
       for key, value of attrs
-        res.push object if object[key] is value
+        all = false if object[key] isnt value
+      res.push object if all
     res
 
   keys: (obj) ->
