@@ -1,18 +1,18 @@
 describe 'Model', ->
   class Author extends Model
-    belongsTo: -> [Post]
+    @belongsTo: -> [Post]
 
   class Comment extends Model
-    belongsTo: -> [Post]
+    @belongsTo: -> [Post]
 
   class Post extends Model
-    hasOne: -> [Author]
-    hasMany: -> [Comment]
+    @hasOne: -> [Author]
+    @hasMany: -> [Comment]
 
   beforeEach ->
-    Post.collection = []
-    Comment.collection = []
-    Author.collection = []
+    Post.deleteAll()
+    Comment.deleteAll()
+    Author.deleteAll()
 
   describe 'adds useful properties', ->
     it 'for class with belongsTo method implemented', ->

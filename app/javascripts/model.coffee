@@ -28,12 +28,12 @@ class @Model
     @fields = utils.uniq(@fields)
 
   addAssociations: ->
-    @addBelongsToAssociation() if !!@belongsTo
-    @addHasOneAssociation() if !!@hasOne
-    @addHasManyAssociation() if !!@hasMany
+    @addBelongsToAssociation() if !!@constructor.belongsTo
+    @addHasOneAssociation() if !!@constructor.hasOne
+    @addHasManyAssociation() if !!@constructor.hasMany
 
   addBelongsToAssociation: ->
-    @belongsTo().forEach (model) =>
+    @constructor.belongsTo().forEach (model) =>
       fieldName = "#{utils.dfl(model.name)}Id"
       @[model.name.toLowerCase()] = =>
         model.find(@[fieldName])
@@ -42,14 +42,14 @@ class @Model
       @fields.push(fieldName) if @fields.indexOf(fieldName) is -1
 
   addHasManyAssociation: ->
-    @hasMany().forEach (model) =>
+    @constructor.hasMany().forEach (model) =>
       @["#{utils.dfl(model.name)}s"] = =>
         obj = {}
         obj["#{utils.dfl(@constructor.name)}Id"] = @id
         new Collection(@, model, model.where(obj)...)
 
   addHasOneAssociation: ->
-    @hasOne().forEach (model) =>
+    @constructor.hasOne().forEach (model) =>
       fieldName = "#{utils.dfl(@constructor.name)}Id"
       @[model.name.toLowerCase()] = =>
         obj = {}
