@@ -35,4 +35,7 @@ utils =
     output[array[key]] = array[key] for key in [0...array.length]
     value for key, value of output
 
+  dfl: (str) ->
+    str[0].toLowerCase() + str.slice(1)
+
 @utils = utils

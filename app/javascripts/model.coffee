@@ -13,7 +13,7 @@ class @Model
     @constructor.collection = @constructor.collection or []
     utils.keys(properties).forEach (key) =>
       @[key] = properties[key] if @fields.indexOf(key) isnt -1
-    @id = utils.uniqueId("#{@constructor.name.toLowerCase()}_") unless @id
+    @id = utils.uniqueId("#{utils.dfl(@constructor.name)}") unless @id
     @constructor.collection.push @
     @initialize()
 
@@ -34,28 +34,29 @@ class @Model
 
   addBelongsToAssociation: ->
     @belongsTo().forEach (model) =>
+      fieldName = "#{utils.dfl(model.name)}Id"
       @[model.name.toLowerCase()] = =>
-        model.find(@["#{model.name.toLowerCase()}_id"])
+        model.find(@[fieldName])
 
-      @["#{model.name.toLowerCase()}_id"] = null
-      @fields.push("#{model.name.toLowerCase()}_id")
-      @fields = utils.uniq(@fields)
+      @[fieldName] = null
+      @fields.push(fieldName) if @fields.indexOf(fieldName) is -1
 
   addHasManyAssociation: ->
     @hasMany().forEach (model) =>
-      @["#{model.name.toLowerCase()}s"] = =>
+      @["#{utils.dfl(model.name)}s"] = =>
         obj = {}
-        obj["#{@constructor.name.toLowerCase()}_id"] = @id
+        obj["#{utils.dfl(@constructor.name)}Id"] = @id
         new Collection(@, model, model.where(obj)...)
 
   addHasOneAssociation: ->
     @hasOne().forEach (model) =>
+      fieldName = "#{utils.dfl(@constructor.name)}Id"
       @[model.name.toLowerCase()] = =>
         obj = {}
-        obj["#{@constructor.name.toLowerCase()}_id"] = @id
+        obj[fieldName] = @id
         model.where(obj)[0]
 
       @["create#{model.name}"] = (props = {}) =>
         obj = {}
-        obj["#{@constructor.name.toLowerCase()}_id"] = @id
+        obj[fieldName] = @id
         model.create(utils.extend(props, obj))

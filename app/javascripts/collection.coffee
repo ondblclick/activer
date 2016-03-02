@@ -5,7 +5,7 @@ class @Collection extends Array
   create: (props) =>
     props = props or {}
     obj = {}
-    obj["#{@parent.constructor.name.toLowerCase()}_id"] = @parent.id
+    obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
     @model.create(utils.extend(props, obj))
 
   deleteAll: =>
