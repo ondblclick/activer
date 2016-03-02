@@ -11,3 +11,7 @@ class @Collection extends Array
   deleteAll: =>
     @model.collection = utils.filter @model.collection, (object) =>
       @indexOf(object) is -1
+
+  where: (props) => utils.where(@, props)
+
+  find: (id) -> @where({ id: id })[0]

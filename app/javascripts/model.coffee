@@ -51,7 +51,7 @@ class @Model
   addHasOneAssociation: ->
     @constructor.hasOne().forEach (model) =>
       fieldName = "#{utils.dfl(@constructor.name)}Id"
-      @[model.name.toLowerCase()] = =>
+      @[utils.dfl(model.name)] = =>
         obj = {}
         obj[fieldName] = @id
         model.where(obj)[0]

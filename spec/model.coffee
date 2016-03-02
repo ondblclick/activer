@@ -43,12 +43,6 @@ describe 'Model', ->
       expect(post.comments()[1]).toBeUndefined
       expect(Comment.all().length).toEqual 1
 
-    it 'for collection returned by hasMany association method', ->
-      post = Post.create()
-      expect(post.comments().length).toEqual 0
-      post.comments().create()
-      expect(post.comments().length).toEqual 1
-
   describe 'adds useful static method', ->
     it '#all', ->
       [1..10].forEach -> Post.create()
