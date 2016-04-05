@@ -1,4 +1,4 @@
-utils = require("../src/utils")
+utils = require("./utils")
 
 class Collection extends Array
   constructor: (@parent, @model, items...) ->

@@ -1,5 +1,5 @@
-Collection = require("../src/collection")
-utils = require("../src/utils")
+Collection = require("./collection")
+utils = require("./utils")
 
 class Model
   @all: -> @collection or []

@@ -1,7 +1,7 @@
 {
   "name": "activer",
-  "version": "0.0.1",
-  "main": "./dist/index.js",
+  "version": "0.1.0",
+  "main": "./dist/model.js",
   "scripts": {
     "clean": "rm -rf dist/*",
     "build": "coffee --compile --output dist src",
