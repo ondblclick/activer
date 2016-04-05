@@ -5,7 +5,7 @@
   "scripts": {
     "clean": "rm -rf dist/*",
     "build": "coffee --compile --output dist src",
-    "watch": "onchange 'src/*.coffee' -- npm run build",
+    "watch": "onchange '*/*.coffee' -- npm test",
     "test": "node_modules/mocha/bin/mocha --compilers coffee:coffee-script/register"
   },
   "devDependencies": {
