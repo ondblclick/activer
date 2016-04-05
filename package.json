@@ -4,23 +4,14 @@
   "main": "./dist/index.js",
   "scripts": {
     "clean": "rm -rf dist/*",
-    "build:js": "coffee --compile --output dist app",
-    "watch:js": "onchange 'app/*.coffee' -- npm run build:js",
-    "test": "./node_modules/karma/bin/karma start --singleRun"
+    "build": "coffee --compile --output dist src",
+    "watch": "onchange 'src/*.coffee' -- npm run build",
+    "test": "node_modules/mocha/bin/mocha --compilers coffee:coffee-script/register"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "coffee-script": "^1.10.0",
-    "jasmine": "^2.4.1",
-    "jasmine-core": "^2.4.1",
-    "jasmine-node": "^1.14.5",
-    "karma": "^0.13.21",
-    "karma-coffee-preprocessor": "^0.3.0",
-    "karma-jasmine": "^0.3.7",
-    "karma-phantomjs-launcher": "^1.0.0",
-    "karma-spec-reporter": "0.0.24",
     "mocha": "^2.4.5",
-    "onchange": "^2.0.0",
-    "phantomjs-prebuilt": "^2.1.4"
+    "onchange": "^2.0.0"
   }
 }
