@@ -38,4 +38,4 @@ utils =
   dfl: (str) ->
     str[0].toLowerCase() + str.slice(1)
 
-@utils = utils
+module.exports = utils

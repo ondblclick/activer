@@ -1,4 +1,7 @@
-class @Model
+Collection = require("./collection")
+utils = require("./utils")
+
+class Model
   @all: -> @collection or []
   @find: (id) -> @where({ id: id })[0]
   @where: (props) -> utils.where(@all(), props)
@@ -60,3 +63,5 @@ class @Model
         obj = {}
         obj[fieldName] = @id
         model.create(utils.extend(props, obj))
+
+module.exports = Model

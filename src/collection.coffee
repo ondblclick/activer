@@ -1,4 +1,6 @@
-class @Collection extends Array
+utils = require("./utils")
+
+class Collection extends Array
   constructor: (@parent, @model, items...) ->
     @splice 0, 0, items...
 
@@ -15,3 +17,5 @@ class @Collection extends Array
   where: (props) => utils.where(@, props)
 
   find: (id) -> @where({ id: id })[0]
+
+module.exports = Collection
