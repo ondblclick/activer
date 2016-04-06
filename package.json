@@ -1,7 +1,10 @@
 {
   "name": "activer",
   "version": "0.1.0",
+  "description": "Parent class for creating activerecord-like relations in JavaScript classes.",
+  "repository": "ondblclick/activer",
   "main": "./dist/model.js",
+  "author": "Bohdan Hontarenko",
   "scripts": {
     "clean": "rm -rf dist/*",
     "build": "coffee --compile --output dist src",
