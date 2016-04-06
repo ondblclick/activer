@@ -2,7 +2,7 @@
 
 Base class for your JavaScript classes that adds useful `hasOne`, `hasMany` and `belongsTo` methods.
 
-## Usage (CoffeeScript)
+## Usage
 
 ```
 import Base from 'activer'
