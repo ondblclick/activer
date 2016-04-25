@@ -48,7 +48,9 @@ class Model
 
   @attributes: (attributes...) ->
     @fields = @fields or []
-    @fields = attributes
+    attributes.forEach (attribute) =>
+      @fields.push attribute
+    @fields = utils.uniq(@fields)
 
   @create: (props = {}) ->
     instance = new @()
@@ -56,6 +58,7 @@ class Model
     @fields.forEach (field) ->
       instance[field] = props[field]
     @collection = @collection or []
+    @fields = @fields or []
     @collection.push(instance)
     instance
 
