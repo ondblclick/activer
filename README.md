@@ -13,7 +13,7 @@ class User extends Model {
   saySomething() { console.log('User'); }
 }
 
-User.attrs('name', 'description');
+User.attributes('name', 'description');
 User.hasOne('Post');
 
 export default User
@@ -28,7 +28,7 @@ class Comment extends Model {
   saySomething() { console.log('Comment'); }
 }
 
-Comment.attrs('name', 'description');
+Comment.attributes('name', 'description');
 Comment.belongsTo('Post');
 
 export default Comment
@@ -44,7 +44,7 @@ class Post extends Model {
   saySomething() { console.log('Post'); }
 }
 
-Post.attrs('name', 'description');
+Post.attributes('name', 'description');
 Post.belongsTo('User');
 Post.hasMany('Comment');
 
