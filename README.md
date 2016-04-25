@@ -61,6 +61,7 @@ var comment1 = post.comments().create({ name: "Comment 1 name", description: "Co
 var comment2 = post.comments().create({ name: "Comment 2 name", description: "Comment 2 description" });
 
 console.log(user.post().comments().length); // returns 2
+console.log(user.post().comments()[0].name); // returns "Comment 1 name"
 ```
 
 See tests for details.
