@@ -3,14 +3,17 @@ expect = require('chai').expect
 
 describe 'Model', ->
   class Author extends Model
-    @belongsTo: -> [Post]
+    @attributes()
+    @belongsTo('Post')
 
   class Comment extends Model
-    @belongsTo: -> [Post]
+    @attributes()
+    @belongsTo('Post')
 
   class Post extends Model
-    @hasOne: -> [Author]
-    @hasMany: -> [Comment]
+    @attributes()
+    @hasOne('Author')
+    @hasMany('Comment')
 
   beforeEach ->
     Post.deleteAll()

@@ -4,10 +4,12 @@ expect = require('chai').expect
 
 describe 'Collection', ->
   class Comment extends Model
-    @belongsTo: -> [Post]
+    @attributes()
+    @belongsTo('Post')
 
   class Post extends Model
-    @hasMany: -> [Comment]
+    @attributes()
+    @hasMany('Comment')
 
   describe 'adds useful properties', ->
     describe 'for collection returned by hasMany association', ->
