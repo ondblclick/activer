@@ -1,17 +1,9 @@
-Model = require("../src/model")
+Author = require("./author")
+Comment = require("./comment")
+Post = require("./post")
 expect = require('chai').expect
 
 describe 'Model', ->
-  class Author extends Model
-    @belongsTo: -> [Post]
-
-  class Comment extends Model
-    @belongsTo: -> [Post]
-
-  class Post extends Model
-    @hasOne: -> [Author]
-    @hasMany: -> [Comment]
-
   beforeEach ->
     Post.deleteAll()
     Comment.deleteAll()

@@ -1,14 +1,9 @@
 Collection = require('../src/collection')
-Model = require('../src/model')
+Comment = require("./comment")
+Post = require("./post")
 expect = require('chai').expect
 
 describe 'Collection', ->
-  class Comment extends Model
-    @belongsTo: -> [Post]
-
-  class Post extends Model
-    @hasMany: -> [Comment]
-
   describe 'adds useful properties', ->
     describe 'for collection returned by hasMany association', ->
       beforeEach ->
