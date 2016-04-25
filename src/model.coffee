@@ -46,7 +46,7 @@ class Model
         obj["#{utils.dfl(klass.name)}Id"] = @id
         new Collection(@, relationClass, relationClass.where(obj)...)
 
-  @attributes: (attributes...) ->
+  @attrs: (attributes...) ->
     @fields = @fields or []
     attributes.forEach (attribute) =>
       @fields.push attribute
