@@ -60,12 +60,15 @@ class Model
     @collection = @collection or []
     @fields = @fields or []
     @collection.push(instance)
+    instance.afterCreate()
     instance
 
   @all: -> @collection or []
   @find: (id) -> @where({ id: id })[0]
   @where: (props) -> utils.where(@all(), props)
   @deleteAll: -> @collection = []
+
+  afterCreate: ->
 
   destroy: ->
     index = @constructor.collection.indexOf(@)

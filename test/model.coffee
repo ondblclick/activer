@@ -9,6 +9,9 @@ describe 'Model', ->
     Comment.deleteAll()
     Author.deleteAll()
 
+  it 'adds callbacks', ->
+    # TODO: test callbacks somehow
+
   it 'adds toJSON method', ->
     post = Post.create({ name: 'name', description: 'description' })
     expect(post.toJSON()).to.eql { name: 'name', description: 'description' }
