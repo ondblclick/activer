@@ -61,7 +61,6 @@ var comment1 = post.comments().create({ name: "Comment 1 name", description: "Co
 var comment2 = post.comments().create({ name: "Comment 2 name", description: "Comment 2 description" });
 
 console.log(user.post().comments().length); // returns 2
-
 ```
 
 See tests for details.
