@@ -1,7 +1,7 @@
 Model = require("../src/model")
 
 class Post extends Model
-  @attributes()
+  @attributes('name', 'description')
   @hasOne('Author')
   @hasMany('Comment')
 

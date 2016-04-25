@@ -9,7 +9,11 @@ describe 'Model', ->
     Comment.deleteAll()
     Author.deleteAll()
 
-  describe 'adds useful properties', ->
+  it 'adds toJSON method', ->
+    post = Post.create({ name: 'name', description: 'description' })
+    expect(post.toJSON()).to.eql { name: 'name', description: 'description' }
+
+  describe 'adds properties', ->
     it 'for class with belongsTo method implemented', ->
       post = Post.create()
       author = Author.create({ postId: post.id })

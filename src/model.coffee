@@ -46,7 +46,7 @@ class Model
         obj["#{utils.dfl(klass.name)}Id"] = @id
         new Collection(@, relationClass, relationClass.where(obj)...)
 
-  @attrs: (attributes...) ->
+  @attributes: (attributes...) ->
     @fields = @fields or []
     attributes.forEach (attribute) =>
       @fields.push attribute
@@ -70,5 +70,11 @@ class Model
   destroy: ->
     index = @constructor.collection.indexOf(@)
     @constructor.collection.splice(index, 1) unless index is -1
+
+  toJSON: ->
+    res = {}
+    @constructor.fields.forEach (field) =>
+      res[field] = @[field]
+    res
 
 module.exports = Model
