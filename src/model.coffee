@@ -12,6 +12,7 @@ class Model
 
   @belongsTo: (models...) ->
     @pushToCtorsList(@) unless @inCtorsList(@)
+    @fields = @fields or ['id'] # in case @attributes() was not called
     klass = @
     models.forEach (m) ->
       klass.fields.push("#{utils.dfl(m)}Id")
@@ -22,6 +23,7 @@ class Model
 
   @hasOne: (models...) ->
     @pushToCtorsList(@) unless @inCtorsList(@)
+    @fields = @fields or ['id'] # in case @attributes() was not called
     klass = @
     models.forEach (m) ->
       klass::["#{utils.dfl(m)}"] = ->
@@ -38,6 +40,7 @@ class Model
 
   @hasMany: (models...) ->
     @pushToCtorsList(@) unless @inCtorsList(@)
+    @fields = @fields or ['id'] # in case @attributes() was not called
     klass = @
     models.forEach (m) ->
       klass::["#{utils.dfl(m)}s"] = ->
@@ -47,7 +50,7 @@ class Model
         new Collection(@, relationClass, relationClass.where(obj)...)
 
   @attributes: (attributes...) ->
-    @fields = @fields or []
+    @fields = @fields or ['id']
     attributes.forEach (attribute) =>
       @fields.push attribute
     @fields = utils.uniq(@fields)
@@ -55,8 +58,8 @@ class Model
   @create: (props = {}) ->
     instance = new @()
     instance.id = props.id or utils.uniqueId("#{utils.dfl(@name)}")
-    @fields.forEach (field) ->
-      instance[field] = props[field]
+    Object.keys(props).forEach (prop) ->
+      instance[prop] = props[prop]
     @collection = @collection or []
     @fields = @fields or []
     @collection.push(instance)

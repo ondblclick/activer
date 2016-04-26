@@ -14,7 +14,7 @@ describe 'Model', ->
 
   it 'adds toJSON method', ->
     post = Post.create({ name: 'name', description: 'description' })
-    expect(post.toJSON()).to.eql { name: 'name', description: 'description' }
+    expect(post.toJSON()).to.eql { name: 'name', description: 'description', id: post.id }
 
   describe 'adds properties', ->
     it 'for class with belongsTo method implemented', ->
