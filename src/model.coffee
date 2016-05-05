@@ -4,17 +4,35 @@ utils = require("./utils")
 class Model
   @constructors: {}
 
-  @pushToCtorsList: (constructor) ->
+  @_addToConstructorsList: (constructor) ->
     Model.constructors[constructor.name] = constructor
 
-  @inCtorsList: (constructor) ->
-    !!Model[constructor.name]
+  @_inConstructorsList: (constructor) ->
+    !!Model.constructors[constructor.name]
+
+  @_getRelationsToBeDeleted: ->
+    res = []
+    for k, v of @relations
+      if v.options and v.options.dependent is 'destroy'
+        res.push { type: v.type, name: k }
+    res
+
+  @_addToRelationsList: (model, options, type) ->
+    @relations = @relations or {}
+    @relations[model] =
+      type: type
+      options: options
+
+  @_inRelationsList: (model) ->
+    true if @relations and @relations[model] isnt undefined
 
   @delegate: (method, target) ->
     @::[method] = -> @["#{utils.dfl(target)}"]()[method]()
 
   @belongsTo: (model, options) ->
-    @pushToCtorsList(@) unless @inCtorsList(@)
+    @_addToConstructorsList(@) unless @_inConstructorsList(@)
+    @_addToRelationsList(model, options, 'belongsTo') unless @_inRelationsList(model)
+
     @fields = @fields or ['id']
     @fields.push("#{utils.dfl(model)}Id")
     @::["#{utils.dfl(model)}"] = ->
@@ -22,12 +40,10 @@ class Model
       relationInstance = relationClass.find(@["#{utils.dfl(model)}Id"])
       relationInstance
 
-    if options and options.dependent is 'destroy'
-      @toBeDestroyed = @toBeDestroyed or {}
-      @toBeDestroyed[model] = 'one'
-
   @hasOne: (model, options) ->
-    @pushToCtorsList(@) unless @inCtorsList(@)
+    @_addToConstructorsList(@) unless @_inConstructorsList(@)
+    @_addToRelationsList(model, options, 'hasOne') unless @_inRelationsList(model)
+
     @fields = @fields or ['id']
     klass = @
 
@@ -43,12 +59,10 @@ class Model
       relationClass = Model.constructors[model]
       relationClass.create(utils.extend(props, obj))
 
-    if options and options.dependent is 'destroy'
-      @toBeDestroyed = @toBeDestroyed or {}
-      @toBeDestroyed[model] = 'one'
-
   @hasMany: (model, options) ->
-    @pushToCtorsList(@) unless @inCtorsList(@)
+    @_addToConstructorsList(@) unless @_inConstructorsList(@)
+    @_addToRelationsList(model, options, 'hasMany') unless @_inRelationsList(model)
+
     @fields = @fields or ['id']
     klass = @
     klass::["#{utils.dfl(model)}s"] = ->
@@ -56,10 +70,6 @@ class Model
       obj = {}
       obj["#{utils.dfl(klass.name)}Id"] = @id
       new Collection(@, relationClass, relationClass.where(obj)...)
-
-    if options and options.dependent is 'destroy'
-      @toBeDestroyed = @toBeDestroyed or {}
-      @toBeDestroyed[model] = 'many'
 
   @attributes: (attributes...) ->
     @fields = @fields or ['id']
@@ -90,9 +100,12 @@ class Model
   destroy: ->
     index = @constructor.collection.indexOf(@)
     @constructor.collection.splice(index, 1) unless index is -1
-    for key, val of @constructor.toBeDestroyed
-      @["#{utils.dfl(key)}s"]().deleteAll() if val is 'many'
-      @["#{utils.dfl(key)}"]().destroy() if val is 'one'
+
+    @constructor._getRelationsToBeDeleted().forEach (relation) =>
+      if relation.type is 'hasMany'
+        @["#{utils.dfl(relation.name)}s"]().deleteAll()
+      if relation.type is 'hasOne' or relation.type is 'belongsTo'
+        @["#{utils.dfl(relation.name)}"]().destroy()
 
     @afterDestroy()
 
