@@ -53,7 +53,7 @@ describe 'Model', ->
     post.destroy()
     expect(Post.all().length).to.eql 0
     expect(Author.all().length).to.eql 0
-    expect(Comment.all().length).to.eql 0
+    expect(Comment.all().length).to.eql 2
 
   describe 'adds useful static method', ->
     it '#all', ->
