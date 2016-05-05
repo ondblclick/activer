@@ -1,6 +1,6 @@
 # activer
 
-Base class for your JavaScript classes that adds useful `hasOne`, `hasMany` and `belongsTo` methods.
+Base class for your JavaScript classes that adds useful `hasOne`, `hasMany`, `belongsTo`, `attributes` and `delegate` static methods.
 
 ## Usage
 
@@ -10,11 +10,12 @@ import Model from 'activer';
 import Post from './post'
 
 class User extends Model {
-  saySomething() { console.log('User'); }
+  sayAnotherThing() { console.log('User'); }
 }
 
 User.attributes('name', 'description');
 User.hasOne('Post');
+User.delegate('saySomething', 'Post');
 
 export default User
 ```
@@ -46,7 +47,7 @@ class Post extends Model {
 
 Post.attributes('name', 'description');
 Post.belongsTo('User');
-Post.hasMany('Comment');
+Post.hasMany('Comment', { dependent: 'destroy' });
 
 export default Post
 ```
@@ -60,8 +61,13 @@ var post = user.createPost({ name: "Post name", description: "Post description" 
 var comment1 = post.comments().create({ name: "Comment 1 name", description: "Comment 1 description" });
 var comment2 = post.comments().create({ name: "Comment 2 name", description: "Comment 2 description" });
 
-console.log(user.post().comments().length); // returns 2
-console.log(user.post().comments()[0].name); // returns "Comment 1 name"
+user.saySomething(); // 'Post'
+console.log(user.post().comments().length); // 2
+console.log(Comment.all().length); // 2
+console.log(user.post().comments()[0].name); // "Comment 1 name"
+user.post().destroy();
+console.log(Comment.all().length); // 0
+console.log(user.post()); // undefined
 ```
 
 See tests for details.
