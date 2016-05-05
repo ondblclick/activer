@@ -5,7 +5,7 @@ Base class for your JavaScript classes that adds useful `hasOne`, `hasMany`, `be
 ## Usage
 
 in your user.js:
-```
+```javascript
 import Model from 'activer';
 import Post from './post'
 
@@ -21,7 +21,7 @@ export default User
 ```
 
 in your comment.js:
-```
+```javascript
 import Model from 'activer';
 import Post from './post';
 
@@ -36,7 +36,7 @@ export default Comment
 ```
 
 in your post.js:
-```
+```javascript
 import Model from 'activer';
 import User from './user';
 import Comment from './comment';
@@ -53,7 +53,7 @@ export default Post
 ```
 
 in your main.js:
-```
+```javascript
 import User from './user';
 
 var user = User.create({ name: "User name", description: "User description" });
