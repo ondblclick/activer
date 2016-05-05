@@ -10,44 +10,41 @@ class Model
   @inCtorsList: (constructor) ->
     !!Model[constructor.name]
 
-  @belongsTo: (models...) ->
+  @belongsTo: (model) ->
     @pushToCtorsList(@) unless @inCtorsList(@)
-    @fields = @fields or ['id'] # in case @attributes() was not called
-    klass = @
-    models.forEach (m) ->
-      klass.fields.push("#{utils.dfl(m)}Id")
-      klass::["#{utils.dfl(m)}"] = ->
-        relationClass = Model.constructors[m]
-        relationInstance = relationClass.find(@["#{utils.dfl(m)}Id"])
-        relationInstance
+    @fields = @fields or ['id']
+    @fields.push("#{utils.dfl(model)}Id")
+    @::["#{utils.dfl(model)}"] = ->
+      relationClass = Model.constructors[model]
+      relationInstance = relationClass.find(@["#{utils.dfl(model)}Id"])
+      relationInstance
 
-  @hasOne: (models...) ->
+  @hasOne: (model) ->
     @pushToCtorsList(@) unless @inCtorsList(@)
-    @fields = @fields or ['id'] # in case @attributes() was not called
+    @fields = @fields or ['id']
     klass = @
-    models.forEach (m) ->
-      klass::["#{utils.dfl(m)}"] = ->
-        relationClass = Model.constructors[m]
-        obj = {}
-        obj["#{utils.dfl(klass.name)}Id"] = @id
-        relationClass.where(obj)[0]
 
-      klass::["create#{m}"] = (props = {}) ->
-        obj = {}
-        obj["#{utils.dfl(klass.name)}Id"] = @id
-        relationClass = Model.constructors[m]
-        relationClass.create(utils.extend(props, obj))
+    klass::["#{utils.dfl(model)}"] = ->
+      relationClass = Model.constructors[model]
+      obj = {}
+      obj["#{utils.dfl(klass.name)}Id"] = @id
+      relationClass.where(obj)[0]
 
-  @hasMany: (models...) ->
+    klass::["create#{model}"] = (props = {}) ->
+      obj = {}
+      obj["#{utils.dfl(klass.name)}Id"] = @id
+      relationClass = Model.constructors[model]
+      relationClass.create(utils.extend(props, obj))
+
+  @hasMany: (model) ->
     @pushToCtorsList(@) unless @inCtorsList(@)
-    @fields = @fields or ['id'] # in case @attributes() was not called
+    @fields = @fields or ['id']
     klass = @
-    models.forEach (m) ->
-      klass::["#{utils.dfl(m)}s"] = ->
-        relationClass = Model.constructors[m]
-        obj = {}
-        obj["#{utils.dfl(klass.name)}Id"] = @id
-        new Collection(@, relationClass, relationClass.where(obj)...)
+    klass::["#{utils.dfl(model)}s"] = ->
+      relationClass = Model.constructors[model]
+      obj = {}
+      obj["#{utils.dfl(klass.name)}Id"] = @id
+      new Collection(@, relationClass, relationClass.where(obj)...)
 
   @attributes: (attributes...) ->
     @fields = @fields or ['id']
@@ -73,9 +70,12 @@ class Model
 
   afterCreate: ->
 
+  afterDestroy: ->
+
   destroy: ->
     index = @constructor.collection.indexOf(@)
     @constructor.collection.splice(index, 1) unless index is -1
+    @afterDestory()
 
   toJSON: ->
     res = {}
