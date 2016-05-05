@@ -5,4 +5,6 @@ class Post extends Model
   @hasOne('Author')
   @hasMany('Comment')
 
+  saySomething: -> 'post instance method called'
+
 module.exports = Post

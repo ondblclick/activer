@@ -67,3 +67,12 @@ describe 'Model', ->
       expect(Post.all().length).to.eql 10
       Post.deleteAll()
       expect(Post.all().length).to.eql 0
+
+    it '#delegate', ->
+      post = Post.create()
+      expect(post.saySomething()).to.eql 'post instance method called'
+      author = post.createAuthor()
+      expect(author.saySomething()).to.eql 'post instance method called'
+      expect(author.comments().length).to.eql 0
+      post.comments().create()
+      expect(author.comments().length).to.eql 1

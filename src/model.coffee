@@ -10,6 +10,9 @@ class Model
   @inCtorsList: (constructor) ->
     !!Model[constructor.name]
 
+  @delegate: (method, target) ->
+    @::[method] = -> @["#{utils.dfl(target)}"]()[method]()
+
   @belongsTo: (model) ->
     @pushToCtorsList(@) unless @inCtorsList(@)
     @fields = @fields or ['id']
