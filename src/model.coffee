@@ -7,9 +7,6 @@ class Model
   @_addToConstructorsList: (constructor) ->
     Model.constructors[constructor.name] = constructor
 
-  @_inConstructorsList: (constructor) ->
-    !!Model.constructors[constructor.name]
-
   @_getRelationsToBeDeleted: ->
     res = []
     for k, v of @relations
@@ -23,15 +20,12 @@ class Model
       type: type
       options: options
 
-  @_inRelationsList: (model) ->
-    true if @relations and @relations[model] isnt undefined
-
   @delegate: (method, target) ->
     @::[method] = -> @["#{utils.dfl(target)}"]()[method]()
 
   @belongsTo: (model, options) ->
-    @_addToConstructorsList(@) unless @_inConstructorsList(@)
-    @_addToRelationsList(model, options, 'belongsTo') unless @_inRelationsList(model)
+    @_addToConstructorsList(@)
+    @_addToRelationsList(model, options, 'belongsTo')
 
     @fields = @fields or ['id']
     @fields.push("#{utils.dfl(model)}Id")
@@ -41,8 +35,8 @@ class Model
       relationInstance
 
   @hasOne: (model, options) ->
-    @_addToConstructorsList(@) unless @_inConstructorsList(@)
-    @_addToRelationsList(model, options, 'hasOne') unless @_inRelationsList(model)
+    @_addToConstructorsList(@)
+    @_addToRelationsList(model, options, 'hasOne')
 
     @fields = @fields or ['id']
     klass = @
@@ -60,8 +54,8 @@ class Model
       relationClass.create(utils.extend(props, obj))
 
   @hasMany: (model, options) ->
-    @_addToConstructorsList(@) unless @_inConstructorsList(@)
-    @_addToRelationsList(model, options, 'hasMany') unless @_inRelationsList(model)
+    @_addToConstructorsList(@)
+    @_addToRelationsList(model, options, 'hasMany')
 
     @fields = @fields or ['id']
     klass = @
