@@ -13,7 +13,7 @@ class Model
   @delegate: (method, target) ->
     @::[method] = -> @["#{utils.dfl(target)}"]()[method]()
 
-  @belongsTo: (model) ->
+  @belongsTo: (model, options) ->
     @pushToCtorsList(@) unless @inCtorsList(@)
     @fields = @fields or ['id']
     @fields.push("#{utils.dfl(model)}Id")
@@ -22,7 +22,11 @@ class Model
       relationInstance = relationClass.find(@["#{utils.dfl(model)}Id"])
       relationInstance
 
-  @hasOne: (model) ->
+    if options and options.dependent is 'destroy'
+      @toBeDestroyed = @toBeDestroyed or {}
+      @toBeDestroyed[model] = 'one'
+
+  @hasOne: (model, options) ->
     @pushToCtorsList(@) unless @inCtorsList(@)
     @fields = @fields or ['id']
     klass = @
@@ -39,7 +43,11 @@ class Model
       relationClass = Model.constructors[model]
       relationClass.create(utils.extend(props, obj))
 
-  @hasMany: (model) ->
+    if options and options.dependent is 'destroy'
+      @toBeDestroyed = @toBeDestroyed or {}
+      @toBeDestroyed[model] = 'one'
+
+  @hasMany: (model, options) ->
     @pushToCtorsList(@) unless @inCtorsList(@)
     @fields = @fields or ['id']
     klass = @
@@ -48,6 +56,10 @@ class Model
       obj = {}
       obj["#{utils.dfl(klass.name)}Id"] = @id
       new Collection(@, relationClass, relationClass.where(obj)...)
+
+    if options and options.dependent is 'destroy'
+      @toBeDestroyed = @toBeDestroyed or {}
+      @toBeDestroyed[model] = 'many'
 
   @attributes: (attributes...) ->
     @fields = @fields or ['id']
@@ -78,7 +90,11 @@ class Model
   destroy: ->
     index = @constructor.collection.indexOf(@)
     @constructor.collection.splice(index, 1) unless index is -1
-    @afterDestory()
+    for key, val of @constructor.toBeDestroyed
+      @["#{utils.dfl(key)}s"]().deleteAll() if val is 'many'
+      @["#{utils.dfl(key)}"]().destroy() if val is 'one'
+
+    @afterDestroy()
 
   toJSON: ->
     res = {}

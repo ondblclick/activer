@@ -42,6 +42,19 @@ describe 'Model', ->
       expect(post.comments()[1]).to.eql undefined
       expect(Comment.all().length).to.eql 1
 
+  it 'dependent: destroy relations', ->
+    post = Post.create()
+    author = post.createAuthor()
+    comment1 = post.comments().create()
+    comment2 = post.comments().create()
+    expect(Post.all().length).to.eql 1
+    expect(Author.all().length).to.eql 1
+    expect(Comment.all().length).to.eql 2
+    post.destroy()
+    expect(Post.all().length).to.eql 0
+    expect(Author.all().length).to.eql 0
+    expect(Comment.all().length).to.eql 0
+
   describe 'adds useful static method', ->
     it '#all', ->
       [1..10].forEach -> Post.create()
