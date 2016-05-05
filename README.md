@@ -55,6 +55,7 @@ export default Post
 in your main.js:
 ```javascript
 import User from './user';
+import Comment from './comment';
 
 var user = User.create({ name: "User name", description: "User description" });
 var post = user.createPost({ name: "Post name", description: "Post description" });
