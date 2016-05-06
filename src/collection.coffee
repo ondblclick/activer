@@ -11,8 +11,7 @@ class Collection extends Array
     @model.create(utils.extend(props, obj))
 
   deleteAll: =>
-    @model.collection = utils.filter @model.collection, (object) =>
-      @indexOf(object) is -1
+    @forEach (object) -> object.destroy()
 
   where: (props) => utils.where(@, props)
 
