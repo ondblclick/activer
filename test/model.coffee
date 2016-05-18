@@ -86,9 +86,9 @@ describe 'Model', ->
 
     it '#delegate', ->
       post = Post.create()
-      expect(post.saySomething()).to.eql 'post instance method called'
+      expect(post.saySomething('something')).to.eql 'something'
       author = post.createAuthor()
-      expect(author.saySomething()).to.eql 'post instance method called'
+      expect(author.saySomething('changed something')).to.eql 'changed something'
       expect(author.comments().length).to.eql 0
       post.comments().create()
       expect(author.comments().length).to.eql 1

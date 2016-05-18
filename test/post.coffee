@@ -5,6 +5,6 @@ class Post extends Model
   @hasOne('Author', { dependent: 'destroy' })
   @hasMany('Comment', { dependent: 'destroy' })
 
-  saySomething: -> 'post instance method called'
+  saySomething: (something) -> something
 
 module.exports = Post

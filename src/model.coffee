@@ -21,7 +21,7 @@ class Model
       options: options
 
   @delegate: (method, target) ->
-    @::[method] = -> @["#{utils.dfl(target)}"]()[method]()
+    @::[method] = (args...) -> @["#{utils.dfl(target)}"]()[method](args...)
 
   @belongsTo: (model, options) ->
     @_addToConstructorsList(@)
