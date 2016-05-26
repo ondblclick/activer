@@ -2,7 +2,7 @@ utils = require("./utils")
 
 class Collection extends Array
   constructor: (@parent, @model, items...) ->
-    @splice 0, 0, items...
+    @push.apply(@, items)
 
   create: (props) =>
     props = props or {}
