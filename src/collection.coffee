@@ -11,13 +11,18 @@ class Collection extends Array
     @model.create(utils.extend(props, obj))
 
   deleteAll: =>
-    @forEach (object) -> object.destroy()
+    obj = {}
+    obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
+    @model.coll.deleteAll(obj)
+
+  destroyAll: ->
 
   where: (props) =>
     obj = {}
     obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
-    @model.where(utils.extend(props, obj))
+    @model.coll.where(utils.extend(props, obj))
 
-  find: (id) -> @where({ id: id })[0]
+  find: (id) ->
+    @model.coll.find(id)
 
 module.exports = Collection

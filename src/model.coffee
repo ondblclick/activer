@@ -31,8 +31,7 @@ class Model
     @fields.push("#{utils.dfl(model)}Id")
     @::["#{utils.dfl(model)}"] = ->
       relationClass = Model.constructors[model]
-      relationInstance = relationClass.find(@["#{utils.dfl(model)}Id"])
-      relationInstance
+      relationClass.build(relationClass.coll.find(@["#{utils.dfl(model)}Id"]))
 
   @hasOne: (model, options) ->
     @_addToConstructorsList(@)
@@ -45,7 +44,7 @@ class Model
       relationClass = Model.constructors[model]
       obj = {}
       obj["#{utils.dfl(klass.name)}Id"] = @id
-      relationClass.where(obj)[0]
+      relationClass.build(relationClass.coll.where(obj)[0])
 
     klass::["create#{model}"] = (props = {}) ->
       obj = {}
@@ -63,7 +62,8 @@ class Model
       relationClass = Model.constructors[model]
       obj = {}
       obj["#{utils.dfl(klass.name)}Id"] = @id
-      new Collection(@, relationClass, relationClass.where(obj)...)
+      # console.log relationClass.coll.where(obj).map((o) -> relationClass.build(0))
+      new Collection(@, relationClass, relationClass.coll.where(obj).map((o) -> relationClass.build(o))...)
 
   @attributes: (attributes...) ->
     @fields = @fields or ['id']
@@ -71,20 +71,24 @@ class Model
       @fields.push attribute
     @fields = utils.uniq(@fields)
 
-  @create: (props = {}) ->
+  @build: (props = {}) ->
     instance = new @()
     instance.id = props.id or utils.uniqueId("#{utils.dfl(@name)}")
     Object.keys(props).forEach (prop) ->
       instance[prop] = props[prop]
     @fields = @fields or []
-    @coll.push(instance)
+    instance
+
+  @create: (props = {}) ->
+    instance = @build(props)
+    @coll.add(utils.extend(props, { id: instance.id }))
     instance.afterCreate()
     instance
 
-  @all: -> @coll or []
-  @find: (id) -> @where({ id: id })[0]
-  @where: (props) -> utils.where(@all(), props)
-  @deleteAll: -> @coll = []
+  @all: -> @coll.collection.map((obj) => @build(obj))
+  @find: (id) -> @coll.find(id)
+  @where: (props = {}) -> @coll.where(props)
+  @deleteAll: -> @coll.deleteAll()
 
   @collection: (func) ->
     @coll = func()
@@ -94,8 +98,7 @@ class Model
   afterDestroy: ->
 
   destroy: ->
-    index = @constructor.coll.indexOf(@)
-    @constructor.coll.splice(index, 1) unless index is -1
+    @constructor.coll.delete(@id)
 
     @constructor._getRelationsToBeDeleted().forEach (relation) =>
       if relation.type is 'hasMany'
@@ -112,10 +115,3 @@ class Model
     res
 
 module.exports = Model
-
-# collection should have methods implemented:
-
-# remove(id) to remove specific item
-# remove() to remove all items
-# add([{}]) to add items
-# in case where/find is implemented it will be used instead of default methods
