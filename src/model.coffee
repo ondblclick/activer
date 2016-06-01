@@ -112,3 +112,10 @@ class Model
     res
 
 module.exports = Model
+
+# collection should have methods implemented:
+
+# remove(id) to remove specific item
+# remove() to remove all items
+# add([{}]) to add items
+# in case where/find is implemented it will be used instead of default methods
