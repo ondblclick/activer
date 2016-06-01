@@ -21,7 +21,7 @@ class Model
       options: options
 
   @delegate: (method, target) ->
-    @::[method] = (args...) -> @["#{utils.dfl(target)}"]()[method](args...)
+    @::[method] = (args) -> @["#{utils.dfl(target)}"]()[method](args)
 
   @belongsTo: (model, options) ->
     @_addToConstructorsList(@)
@@ -76,24 +76,26 @@ class Model
     instance.id = props.id or utils.uniqueId("#{utils.dfl(@name)}")
     Object.keys(props).forEach (prop) ->
       instance[prop] = props[prop]
-    @collection = @collection or []
     @fields = @fields or []
-    @collection.push(instance)
+    @coll.push(instance)
     instance.afterCreate()
     instance
 
-  @all: -> @collection or []
+  @all: -> @coll or []
   @find: (id) -> @where({ id: id })[0]
   @where: (props) -> utils.where(@all(), props)
-  @deleteAll: -> @collection = []
+  @deleteAll: -> @coll = []
+
+  @collection: (func) ->
+    @coll = func()
 
   afterCreate: ->
 
   afterDestroy: ->
 
   destroy: ->
-    index = @constructor.collection.indexOf(@)
-    @constructor.collection.splice(index, 1) unless index is -1
+    index = @constructor.coll.indexOf(@)
+    @constructor.coll.splice(index, 1) unless index is -1
 
     @constructor._getRelationsToBeDeleted().forEach (relation) =>
       if relation.type is 'hasMany'
