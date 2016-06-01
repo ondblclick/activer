@@ -13,7 +13,10 @@ class Collection extends Array
   deleteAll: =>
     @forEach (object) -> object.destroy()
 
-  where: (props) => utils.where(@, props)
+  where: (props) =>
+    obj = {}
+    obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
+    @model.where(utils.extend(props, obj))
 
   find: (id) -> @where({ id: id })[0]
 
