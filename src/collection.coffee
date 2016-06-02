@@ -20,9 +20,9 @@ class Collection extends Array
   where: (props) =>
     obj = {}
     obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
-    @model.coll.where(utils.extend(props, obj))
+    @model.coll.getAll(utils.extend(props, obj))
 
   find: (id) ->
-    @model.coll.find(id)
+    @model.coll.get(id)
 
 module.exports = Collection

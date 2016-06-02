@@ -31,7 +31,7 @@ class Model
     @fields.push("#{utils.dfl(model)}Id")
     @::["#{utils.dfl(model)}"] = ->
       relationClass = Model.constructors[model]
-      relationClass.build(relationClass.coll.find(@["#{utils.dfl(model)}Id"]))
+      relationClass.build(relationClass.coll.get(@["#{utils.dfl(model)}Id"]))
 
   @hasOne: (model, options) ->
     @_addToConstructorsList(@)
@@ -44,7 +44,7 @@ class Model
       relationClass = Model.constructors[model]
       obj = {}
       obj["#{utils.dfl(klass.name)}Id"] = @id
-      relationClass.build(relationClass.coll.where(obj)[0])
+      relationClass.build(relationClass.coll.getAll(obj)[0])
 
     klass::["create#{model}"] = (props = {}) ->
       obj = {}
@@ -62,8 +62,7 @@ class Model
       relationClass = Model.constructors[model]
       obj = {}
       obj["#{utils.dfl(klass.name)}Id"] = @id
-      # console.log relationClass.coll.where(obj).map((o) -> relationClass.build(0))
-      new Collection(@, relationClass, relationClass.coll.where(obj).map((o) -> relationClass.build(o))...)
+      new Collection(@, relationClass, relationClass.coll.getAll(obj).map((o) -> relationClass.build(o))...)
 
   @attributes: (attributes...) ->
     @fields = @fields or ['id']
@@ -81,13 +80,13 @@ class Model
 
   @create: (props = {}) ->
     instance = @build(props)
-    @coll.add(utils.extend(props, { id: instance.id }))
+    @coll.create(utils.extend(props, { id: instance.id }))
     instance.afterCreate()
     instance
 
   @all: -> @coll.collection.map((obj) => @build(obj))
-  @find: (id) -> @coll.find(id)
-  @where: (props = {}) -> @coll.where(props)
+  @find: (id) -> @coll.get(id)
+  @where: (props = {}) -> @coll.getAll(props)
   @deleteAll: -> @coll.deleteAll()
 
   @collection: (dao) ->
