@@ -1,5 +1,6 @@
 Collection = require("./collection")
 utils = require("./utils")
+dao = require("./dao")
 
 class Model
   @constructors: {}
@@ -31,7 +32,7 @@ class Model
     @fields.push("#{utils.dfl(model)}Id")
     @::["#{utils.dfl(model)}"] = ->
       relationClass = Model.constructors[model]
-      relationClass.build(relationClass.dao.get(@["#{utils.dfl(model)}Id"]))
+      relationClass.build(relationClass.dao().get(@["#{utils.dfl(model)}Id"]))
 
   @hasOne: (model, options) ->
     @_addToConstructorsList(@)
@@ -44,7 +45,7 @@ class Model
       relationClass = Model.constructors[model]
       obj = {}
       obj["#{utils.dfl(klass.name)}Id"] = @id
-      relationClass.build(relationClass.dao.getAll(obj)[0])
+      relationClass.build(relationClass.dao().getAll(obj)[0])
 
     klass::["create#{model}"] = (props = {}) ->
       obj = {}
@@ -62,7 +63,7 @@ class Model
       relationClass = Model.constructors[model]
       obj = {}
       obj["#{utils.dfl(klass.name)}Id"] = @id
-      new Collection(@, relationClass, relationClass.dao.getAll(obj).map((o) -> relationClass.build(o))...)
+      new Collection(@, relationClass, relationClass.dao().getAll(obj).map((o) -> relationClass.build(o))...)
 
   @attributes: (attributes...) ->
     @fields = @fields or ['id']
@@ -80,26 +81,30 @@ class Model
 
   @create: (props = {}) ->
     instance = @build(props)
-    @dao.create(utils.extend(props, { id: instance.id }))
+    @dao().create(utils.extend(props, { id: instance.id }))
     instance.afterCreate()
     instance
 
-  @all: -> @dao.collection.map((obj) => @build(obj))
-  @find: (id) -> @dao.get(id)
-  @where: (props = {}) -> @dao.getAll(props)
-  @deleteAll: -> @dao.deleteAll()
+  @all: -> @dao().collection.map((obj) => @build(obj))
+  @find: (id) -> @dao().get(id)
+  @where: (props = {}) -> @dao().getAll(props)
+  @deleteAll: -> @dao().deleteAll()
 
-  @collection: (@dao) ->
+  @collection: (@externalDao) ->
+
+  @dao: ->
+    @d = @externalDao or dao() if not @d
+    @d
 
   afterCreate: ->
 
   afterDestroy: ->
 
   update: (props) ->
-    @constructor.dao.update(@id, props)
+    @constructor.dao().update(@id, props)
 
   destroy: ->
-    @constructor.dao.delete(@id)
+    @constructor.dao().delete(@id)
 
     @constructor._getRelationsToBeDeleted().forEach (relation) =>
       if relation.type is 'hasMany'
