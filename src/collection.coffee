@@ -13,16 +13,16 @@ class Collection extends Array
   deleteAll: =>
     obj = {}
     obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
-    @model.coll.deleteAll(obj)
+    @model.dao.deleteAll(obj)
 
   destroyAll: ->
 
   where: (props) =>
     obj = {}
     obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
-    @model.coll.getAll(utils.extend(props, obj))
+    @model.dao.getAll(utils.extend(props, obj))
 
   find: (id) ->
-    @model.coll.get(id)
+    @model.dao.get(id)
 
 module.exports = Collection

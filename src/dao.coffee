@@ -3,6 +3,10 @@ utils = require("./utils")
 dao = ->
   collection: []
 
+  create: (object) ->
+    @collection.push(object)
+    JSON.parse(JSON.stringify(object))
+
   update: (id, props) ->
     rec = @get(id)
     for key, value of props
@@ -18,9 +22,8 @@ dao = ->
     else
       @collection = []
 
-  create: (object) ->
-    @collection.push(object)
-    JSON.parse(JSON.stringify(object))
+  get: (id) ->
+    @getAll({ id: id })[0]
 
   getAll: (options) ->
     if options
@@ -33,8 +36,5 @@ dao = ->
       res
     else
       @collection
-
-  get: (id) ->
-    @getAll({ id: id })[0]
 
 module.exports = dao
