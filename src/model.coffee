@@ -22,14 +22,14 @@ class Model
       options: options
 
   @delegate: (method, target) ->
-    @::[method] = (args) -> @["#{utils.dfl(target)}"]()[method](args)
+    @::[method] = (args) -> @[utils.dfl(target)]()[method](args)
 
   @belongsTo: (model, options) ->
     @_addToConstructorsList(@)
     @_addToRelationsList(model, options, 'belongsTo')
     @attributes("#{utils.dfl(model)}Id")
 
-    @::["#{utils.dfl(model)}"] = ->
+    @::[utils.dfl(model)] = ->
       relationClass = Model.constructors[model]
       relationClass.build(relationClass.dao().get(@["#{utils.dfl(model)}Id"]))
 
@@ -39,7 +39,7 @@ class Model
 
     klass = @
 
-    klass::["#{utils.dfl(model)}"] = ->
+    klass::[utils.dfl(model)] = ->
       relationClass = Model.constructors[model]
       obj = {}
       obj["#{utils.dfl(klass.name)}Id"] = @id
@@ -73,7 +73,7 @@ class Model
 
   @build: (props = {}) ->
     instance = new @()
-    instance.id = props.id or utils.uniqueId("#{utils.dfl(@name)}")
+    instance.id = props.id or utils.uniqueId(utils.dfl(@name))
     Object.keys(props).forEach (prop) ->
       instance[prop] = props[prop]
     instance
@@ -109,7 +109,7 @@ class Model
       if relation.type is 'hasMany'
         @["#{utils.dfl(relation.name)}s"]().deleteAll()
       if relation.type is 'hasOne' or relation.type is 'belongsTo'
-        @["#{utils.dfl(relation.name)}"]().destroy()
+        @[utils.dfl(relation.name)]().destroy()
 
     @afterDestroy()
 
