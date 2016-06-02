@@ -3,10 +3,10 @@ utils = require("./utils")
 dao = require("./dao")
 
 class Model
-  @constructors: {}
+  @_constructors: {}
 
   @_addToConstructorsList: (constructor) ->
-    Model.constructors[constructor.name] = constructor
+    Model._constructors[constructor.name] = constructor
 
   @_getRelationsToBeDeleted: ->
     res = []
@@ -30,7 +30,7 @@ class Model
     @attributes("#{utils.dfl(model)}Id")
 
     @::[utils.dfl(model)] = ->
-      relationClass = Model.constructors[model]
+      relationClass = Model._constructors[model]
       relationClass.build(relationClass.dao().get(@["#{utils.dfl(model)}Id"]))
 
   @hasOne: (model, options) ->
@@ -38,7 +38,7 @@ class Model
     @_addToRelationsList(model, options, 'hasOne')
 
     @::[utils.dfl(model)] = ->
-      relationClass = Model.constructors[model]
+      relationClass = Model._constructors[model]
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
       relationClass.build(relationClass.dao().getAll(obj)[0])
@@ -46,7 +46,7 @@ class Model
     @::["create#{model}"] = (props = {}) ->
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
-      relationClass = Model.constructors[model]
+      relationClass = Model._constructors[model]
       relationClass.create(utils.extend(props, obj))
 
   @hasMany: (model, options) ->
@@ -54,7 +54,7 @@ class Model
     @_addToRelationsList(model, options, 'hasMany')
 
     @::["#{utils.dfl(model)}s"] = ->
-      relationClass = Model.constructors[model]
+      relationClass = Model._constructors[model]
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
       new Collection(@, relationClass, relationClass.dao().getAll(obj).map((o) -> relationClass.build(o))...)
