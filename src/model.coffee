@@ -90,8 +90,8 @@ class Model
   @where: (props = {}) -> @coll.where(props)
   @deleteAll: -> @coll.deleteAll()
 
-  @collection: (func) ->
-    @coll = func()
+  @collection: (dao) ->
+    @coll = dao
 
   afterCreate: ->
 
