@@ -27,9 +27,8 @@ class Model
   @belongsTo: (model, options) ->
     @_addToConstructorsList(@)
     @_addToRelationsList(model, options, 'belongsTo')
+    @attributes("#{utils.dfl(model)}Id")
 
-    @fields = @fields or ['id']
-    @fields.push("#{utils.dfl(model)}Id")
     @::["#{utils.dfl(model)}"] = ->
       relationClass = Model.constructors[model]
       relationClass.build(relationClass.dao().get(@["#{utils.dfl(model)}Id"]))
@@ -38,7 +37,6 @@ class Model
     @_addToConstructorsList(@)
     @_addToRelationsList(model, options, 'hasOne')
 
-    @fields = @fields or ['id']
     klass = @
 
     klass::["#{utils.dfl(model)}"] = ->
@@ -57,7 +55,6 @@ class Model
     @_addToConstructorsList(@)
     @_addToRelationsList(model, options, 'hasMany')
 
-    @fields = @fields or ['id']
     klass = @
     klass::["#{utils.dfl(model)}s"] = ->
       relationClass = Model.constructors[model]
@@ -66,17 +63,19 @@ class Model
       new Collection(@, relationClass, relationClass.dao().getAll(obj).map((o) -> relationClass.build(o))...)
 
   @attributes: (attributes...) ->
-    @fields = @fields or ['id']
-    attributes.forEach (attribute) =>
-      @fields.push attribute
-    @fields = utils.uniq(@fields)
+    if attributes.length
+      @fields = @fields or ['id']
+      attributes.forEach (attribute) =>
+        @fields.push attribute
+        @fields = utils.uniq(@fields)
+    else
+      @fields or ['id']
 
   @build: (props = {}) ->
     instance = new @()
     instance.id = props.id or utils.uniqueId("#{utils.dfl(@name)}")
     Object.keys(props).forEach (prop) ->
       instance[prop] = props[prop]
-    @fields = @fields or []
     instance
 
   @create: (props = {}) ->
@@ -116,7 +115,7 @@ class Model
 
   toJSON: ->
     res = {}
-    @constructor.fields.forEach (field) =>
+    @constructor.attributes().forEach (field) =>
       res[field] = @[field]
     res
 
