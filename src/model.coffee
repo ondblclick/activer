@@ -10,14 +10,14 @@ class Model
 
   @_getRelationsToBeDeleted: ->
     res = []
-    for k, v of @relations
+    for k, v of @_relations
       if v.options and v.options.dependent is 'destroy'
         res.push { type: v.type, name: k }
     res
 
   @_addToRelationsList: (model, options, type) ->
-    @relations = @relations or {}
-    @relations[model] =
+    @_relations = @_relations or {}
+    @_relations[model] =
       type: type
       options: options
 
@@ -37,17 +37,15 @@ class Model
     @_addToConstructorsList(@)
     @_addToRelationsList(model, options, 'hasOne')
 
-    klass = @
-
-    klass::[utils.dfl(model)] = ->
+    @::[utils.dfl(model)] = ->
       relationClass = Model.constructors[model]
       obj = {}
-      obj["#{utils.dfl(klass.name)}Id"] = @id
+      obj["#{utils.dfl(@constructor.name)}Id"] = @id
       relationClass.build(relationClass.dao().getAll(obj)[0])
 
-    klass::["create#{model}"] = (props = {}) ->
+    @::["create#{model}"] = (props = {}) ->
       obj = {}
-      obj["#{utils.dfl(klass.name)}Id"] = @id
+      obj["#{utils.dfl(@constructor.name)}Id"] = @id
       relationClass = Model.constructors[model]
       relationClass.create(utils.extend(props, obj))
 
@@ -55,36 +53,35 @@ class Model
     @_addToConstructorsList(@)
     @_addToRelationsList(model, options, 'hasMany')
 
-    klass = @
-    klass::["#{utils.dfl(model)}s"] = ->
+    @::["#{utils.dfl(model)}s"] = ->
       relationClass = Model.constructors[model]
       obj = {}
-      obj["#{utils.dfl(klass.name)}Id"] = @id
+      obj["#{utils.dfl(@constructor.name)}Id"] = @id
       new Collection(@, relationClass, relationClass.dao().getAll(obj).map((o) -> relationClass.build(o))...)
 
   @attributes: (attributes...) ->
     if attributes.length
-      @fields = @fields or ['id']
+      @_fields = @_fields or ['id']
       attributes.forEach (attribute) =>
-        @fields.push attribute
-        @fields = utils.uniq(@fields)
+        @_fields.push attribute
+        @_fields = utils.uniq(@_fields)
     else
-      @fields or ['id']
+      @_fields or ['id']
 
   @build: (props = {}) ->
     instance = new @()
-    instance.id = props.id or utils.uniqueId(utils.dfl(@name))
-    Object.keys(props).forEach (prop) ->
-      instance[prop] = props[prop]
+    Object.keys(props).forEach (prop) =>
+      instance[prop] = props[prop] if prop in @attributes()
     instance
 
   @create: (props = {}) ->
     instance = @build(props)
+    instance.id = instance.id or utils.uniqueId(utils.dfl(@name))
     @dao().create(utils.extend(props, { id: instance.id }))
     instance.afterCreate()
     instance
 
-  @all: -> @dao().collection.map((obj) => @build(obj))
+  @all: -> @dao().getAll().map((obj) => @build(obj))
   @find: (id) -> @dao().get(id)
   @where: (props = {}) -> @dao().getAll(props)
   @deleteAll: -> @dao().deleteAll()

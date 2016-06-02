@@ -1,10 +1,10 @@
 utils = require("./utils")
 
 dao = ->
-  collection: []
+  _collection: []
 
   create: (object) ->
-    @collection.push(object)
+    @_collection.push(object)
     JSON.parse(JSON.stringify(object))
 
   update: (id, props) ->
@@ -13,14 +13,14 @@ dao = ->
       rec[key] = value
 
   delete: (id) ->
-    @collection = @collection.filter (el) -> el.id isnt id
+    @_collection = @_collection.filter (el) -> el.id isnt id
 
   deleteAll: (options) ->
     if options
       toBeDeletedIds = @getAll(options).map (el) -> el.id
-      @collection = @collection.filter (el) -> toBeDeletedIds.indexOf(el.id) is -1
+      @_collection = @_collection.filter (el) -> toBeDeletedIds.indexOf(el.id) is -1
     else
-      @collection = []
+      @_collection = []
 
   get: (id) ->
     @getAll({ id: id })[0]
@@ -28,13 +28,13 @@ dao = ->
   getAll: (options) ->
     if options
       res = []
-      @collection.forEach (object) ->
+      @_collection.forEach (object) ->
         all = true
         for key, value of options
           all = false if object[key] isnt value
         res.push object if all
       res
     else
-      @collection
+      @_collection
 
 module.exports = dao
