@@ -82,8 +82,10 @@ class Model
     instance
 
   @all: -> @dao().getAll().map((obj) => @build(obj))
-  @find: (id) -> @dao().get(id)
-  @where: (props = {}) -> @dao().getAll(props)
+  @find: (id) ->
+    return unless @dao().get(id)
+    @build(@dao().get(id))
+  @where: (props = {}) -> @dao().getAll(props).map((obj) => @build(obj))
   @deleteAll: -> @dao().deleteAll()
 
   @collection: (@externalDao) ->
