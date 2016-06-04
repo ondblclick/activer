@@ -45,6 +45,25 @@ describe 'Model', ->
       expect(post.comments()[1]).to.eql undefined
       expect(Comment.all().length).to.eql 1
 
+  it 'save method', ->
+    post = Post.create()
+    expect(post.name).to.eql undefined
+    expect(Post.find(post.id).name).to.eql undefined
+    post.name = 'postName'
+    expect(post.name).to.eql 'postName'
+    expect(Post.find(post.id).name).to.eql undefined
+    post.save()
+    expect(post.name).to.eql 'postName'
+    expect(Post.find(post.id).name).to.eql 'postName'
+
+  it 'update method', ->
+    post = Post.create()
+    expect(post.name).to.eql undefined
+    expect(Post.find(post.id).name).to.eql undefined
+    post.update({ name: 'postName' })
+    expect(post.name).to.eql 'postName'
+    expect(Post.find(post.id).name).to.eql 'postName'
+
   it 'dependent: destroy relations', ->
     post = Post.create()
     author = post.createAuthor()
@@ -56,7 +75,7 @@ describe 'Model', ->
     post.destroy()
     expect(Post.all().length).to.eql 0
     expect(Author.all().length).to.eql 0
-    expect(Comment.all().length).to.eql 0
+    expect(Comment.all().length).to.eql 2
 
   describe 'adds useful static method', ->
     it '#all', ->
@@ -74,9 +93,9 @@ describe 'Model', ->
       expect(Post.where({ id: 20 }).length).to.eql 0
 
     it '#create', ->
-      expect(Post.collection).to.eql []
+      expect(Post.all()).to.eql []
       post = Post.create()
-      expect(Post.collection).to.eql [post]
+      expect(Post.all()).to.eql [post]
 
     it '#deleteAll', ->
       [1..10].forEach -> Post.create()
@@ -88,7 +107,7 @@ describe 'Model', ->
       post = Post.create()
       expect(post.saySomething('something')).to.eql 'something'
       author = post.createAuthor()
-      expect(author.saySomething('changed something')).to.eql 'changed something'
+      expect(author.saySomething('another thing')).to.eql 'another thing'
       expect(author.comments().length).to.eql 0
       post.comments().create()
       expect(author.comments().length).to.eql 1

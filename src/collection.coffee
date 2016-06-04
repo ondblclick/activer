@@ -11,10 +11,18 @@ class Collection extends Array
     @model.create(utils.extend(props, obj))
 
   deleteAll: =>
-    @forEach (object) -> object.destroy()
+    obj = {}
+    obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
+    @model.dao().deleteAll(obj)
 
-  where: (props) => utils.where(@, props)
+  destroyAll: ->
 
-  find: (id) -> @where({ id: id })[0]
+  where: (props) =>
+    obj = {}
+    obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
+    @model.dao().getAll(utils.extend(props, obj))
+
+  find: (id) ->
+    @model.dao().get(id)
 
 module.exports = Collection
