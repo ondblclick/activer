@@ -1,6 +1,6 @@
 # activer
 
-Base class for your JavaScript classes that adds useful `hasOne`, `hasMany`, `belongsTo`, `attributes` and `delegate` static methods.
+Base class for your JavaScript models that adds useful `hasOne`, `hasMany`, `belongsTo`, `attributes` and `delegate` static methods (as well as `save`, `update` and `destroy` instance methods and a few callbacks).
 
 ## Usage
 
@@ -72,3 +72,21 @@ console.log(user.post()); // undefined
 ```
 
 See tests for details.
+
+## Store
+
+Activer uses in-memory storage by default but you can specify your own data access object to use whatewer you want using the static `collection` method. DAO should implement some methods:
+
+```
+dataAccessObject = {
+  create(props) { /**/ }
+  update(id, props) { /**/ }
+  delete(id) { /**/ }
+  deleteAll(props) { /**/ }
+  get(id) { /**/ }
+  getAll(props) { /**/ }
+}
+
+class User extends Model {}
+User.collection(dataAccessObject)
+```
