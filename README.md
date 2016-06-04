@@ -77,7 +77,7 @@ See tests for details.
 
 Activer uses in-memory storage by default but you can specify your own data access object to use whatewer you want using the static `collection` method. DAO should implement some methods:
 
-```
+```javascript
 dataAccessObject = {
   create(props) { /**/ }
   update(id, props) { /**/ }
