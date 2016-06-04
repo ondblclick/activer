@@ -97,7 +97,12 @@ class Model
   afterDestroy: ->
 
   update: (props) ->
-    @constructor.dao().update(@id, props)
+    for key, value of props
+      @[key] = value if key in @constructor.attributes()
+    @save()
+
+  save: ->
+    @constructor.dao().update(@id, @toJSON())
 
   destroy: ->
     @constructor.dao().delete(@id)

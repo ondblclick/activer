@@ -45,6 +45,25 @@ describe 'Model', ->
       expect(post.comments()[1]).to.eql undefined
       expect(Comment.all().length).to.eql 1
 
+  it 'save method', ->
+    post = Post.create()
+    expect(post.name).to.eql undefined
+    expect(Post.find(post.id).name).to.eql undefined
+    post.name = 'postName'
+    expect(post.name).to.eql 'postName'
+    expect(Post.find(post.id).name).to.eql undefined
+    post.save()
+    expect(post.name).to.eql 'postName'
+    expect(Post.find(post.id).name).to.eql 'postName'
+
+  it 'update method', ->
+    post = Post.create()
+    expect(post.name).to.eql undefined
+    expect(Post.find(post.id).name).to.eql undefined
+    post.update({ name: 'postName' })
+    expect(post.name).to.eql 'postName'
+    expect(Post.find(post.id).name).to.eql 'postName'
+
   it 'dependent: destroy relations', ->
     post = Post.create()
     author = post.createAuthor()
