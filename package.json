@@ -1,6 +1,6 @@
 {
   "name": "activer",
-  "version": "0.9.3",
+  "version": "0.9.5",
   "description": "Parent class for creating activerecord-like relations in JavaScript classes.",
   "repository": "ondblclick/activer",
   "main": "./dist/model.js",
