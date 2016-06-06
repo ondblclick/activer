@@ -81,8 +81,8 @@ Activer uses in-memory storage by default but you can specify your own data acce
 dataAccessObject = {
   create(props) { /**/ }
   update(id, props) { /**/ }
-  delete(id) { /**/ }
-  deleteAll(props) { /**/ }
+  remove(id) { /**/ }
+  removeAll(props) { /**/ }
   get(id) { /**/ }
   getAll(props) { /**/ }
 }
