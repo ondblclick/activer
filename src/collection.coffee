@@ -13,9 +13,7 @@ class Collection extends Array
   deleteAll: =>
     obj = {}
     obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
-    @model.dao().deleteAll(obj)
-
-  destroyAll: ->
+    @model.dao().removeAll(obj)
 
   where: (props) =>
     obj = {}

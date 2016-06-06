@@ -12,10 +12,10 @@ dao = ->
     for key, value of props
       rec[key] = value
 
-  delete: (id) ->
+  remove: (id) ->
     @_collection = @_collection.filter (el) -> el.id isnt id
 
-  deleteAll: (options) ->
+  removeAll: (options) ->
     if options
       toBeDeletedIds = @getAll(options).map (el) -> el.id
       @_collection = @_collection.filter (el) -> toBeDeletedIds.indexOf(el.id) is -1
