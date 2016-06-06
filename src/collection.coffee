@@ -4,21 +4,23 @@ class Collection extends Array
   constructor: (@parent, @model, items...) ->
     @push.apply(@, items)
 
+  _buildParentIdObj: =>
+    obj = {}
+    obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
+    obj
+
   create: (props) =>
     props = props or {}
-    obj = {}
-    obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
-    @model.create(utils.extend(props, obj))
+    @model.create(utils.extend(props, @_buildParentIdObj()))
 
   deleteAll: =>
-    obj = {}
-    obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
-    @model.dao().removeAll(obj)
+    @model.dao().removeAll(@_buildParentIdObj())
+
+  destroyAll: =>
+    @model.dao().getAll(@_buildParentIdObj()).map((obj) => @model.build(obj)).forEach((obj) -> obj.destroy())
 
   where: (props) =>
-    obj = {}
-    obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
-    @model.dao().getAll(utils.extend(props, obj)).map((obj) => @model.build(obj))
+    @model.dao().getAll(utils.extend(props, @_buildParentIdObj())).map((obj) => @model.build(obj))
 
   find: (id) ->
     return unless @model.dao().get(id)

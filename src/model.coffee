@@ -87,6 +87,7 @@ class Model
     @build(@dao().get(id))
   @where: (props = {}) -> @dao().getAll(props).map((obj) => @build(obj))
   @deleteAll: -> @dao().removeAll()
+  @destroyAll: -> @all().forEach((obj) -> obj.destroy())
 
   @collection: (@externalDao) ->
 
@@ -106,8 +107,11 @@ class Model
   save: ->
     @constructor.dao().update(@id, @toJSON())
 
-  destroy: ->
+  remove: ->
     @constructor.dao().remove(@id)
+
+  destroy: ->
+    @remove()
 
     @constructor._getRelationsToBeDeleted().forEach (relation) =>
       if relation.type is 'hasMany'
