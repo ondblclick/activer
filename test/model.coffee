@@ -12,20 +12,27 @@ describe 'Model', ->
   describe 'adds properties', ->
     it 'for class with belongsTo method implemented', ->
       post = Post.create()
-      author = Author.create({ postId: post.id })
-      expect(author.post()).to.eql post
-      expect(author.postId).to.eql post.id
+      author1 = Author.create({ postId: post.id })
+      expect(author1.post()).to.eql post
+      author2 = Author.create({ postId: null })
+      expect(author2.post()).to.eql null
 
     it 'for class with hasOne method implemented', ->
       post1 = Post.create()
       post2 = Post.create()
+      post3 = Post.create()
       author1 = Author.create({ postId: post1.id })
       author2 = post2.createAuthor()
       expect(post1.author()).to.eql author1
       expect(post2.author()).to.eql author2
+      expect(post3.author()).to.eql null
+      author3 = post2.createAuthor()
+      expect(post2.author()).to.not.eql author2
+      expect(post2.author()).to.eql author3
 
     it 'for class with hasMany method implemented', ->
       post = Post.create()
+      expect(post.comments().length).to.eq 0
       comment1 = Comment.create({ postId: post.id })
       comment2 = Comment.create({ postId: post.id })
       comment3 = Comment.create()

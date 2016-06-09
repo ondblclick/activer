@@ -31,7 +31,9 @@ class Model
 
     @::[utils.dfl(model)] = ->
       relationClass = Model._constructors[model]
-      relationClass.build(relationClass.dao().get(@["#{utils.dfl(model)}Id"]))
+      record = relationClass.dao().get(@["#{utils.dfl(model)}Id"])
+      return null unless record
+      relationClass.build(record)
 
   @hasOne: (model, options) ->
     @_addToConstructorsList(@)
@@ -41,12 +43,20 @@ class Model
       relationClass = Model._constructors[model]
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
-      relationClass.build(relationClass.dao().getAll(obj)[0])
+      record = relationClass.dao().getAll(obj)[0]
+      return null unless record
+      relationClass.build(record)
 
     @::["create#{model}"] = (props = {}) ->
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
       relationClass = Model._constructors[model]
+
+      # check if relation is already there and remove it
+      record = relationClass.dao().getAll(obj)[0]
+      relationClass.dao().remove(record.id) if record
+
+      # create new relation
       relationClass.create(utils.extend(props, obj))
 
   @hasMany: (model, options) ->
