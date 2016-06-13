@@ -28,23 +28,23 @@ describe 'Collection', ->
     it 'for hasMany relation', ->
       post = Post.create()
       comment1 = post.comments().create()
-      expect(post.comments().length).to.eq 1
-      expect(post.comments()[0].id).to.eq comment1.id
+      expect(post.comments().length).to.eql 1
+      expect(post.comments()[0]).to.deep.eql comment1
 
     it 'for #where method called on Model', ->
       post = Post.create()
-      expect(Post.where({ id: post.id })[0].id).to.eql post.id
+      expect(Post.where({ id: post.id })[0]).to.deep.eql post
 
     it 'for #all method called on Model', ->
       post = Post.create()
-      expect(Post.all()[0].id).to.eql post.id
+      expect(Post.all()[0]).to.deep.eql post
 
     it 'for #where method called on Collection', ->
       post1 = Post.create({ name: 'Some name', description: 'Some description' })
       post2 = Post.create({ name: 'Another name', description: 'Some description' })
       expect(Post.where({ description: 'Some description' }).length).to.eql 2
       expect(Post.where({ description: 'Some description' }).where({ name: 'Some name' }).length).to.eql 1
-      expect(Post.where({ description: 'Some description' }).where({ name: 'Some name' })[0].id).to.eql post1.id
+      expect(Post.where({ description: 'Some description' }).where({ name: 'Some name' })[0]).to.deep.eql post1
 
   describe 'has method', ->
     it '#create', ->
@@ -68,4 +68,4 @@ describe 'Collection', ->
     it '#find', ->
       post = Post.create()
       comment = post.comments().create({ id: 1 })
-      expect(post.comments().find(1)).to.not.eql undefined
+      expect(post.comments().find(1)).to.deep.eql comment
