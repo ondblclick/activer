@@ -90,3 +90,7 @@ dataAccessObject = {
 class User extends Model {}
 User.collection(dataAccessObject)
 ```
+
+## Changelog
+
+0.10.0: Model static methods `all` and `where` now return Collection instance. Collection instance method `where` now returns new Collection instance.
