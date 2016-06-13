@@ -5,9 +5,12 @@ class Collection extends Array
     @push.apply(@, items)
 
   _buildParentIdObj: =>
-    obj = {}
-    obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
-    obj
+    if @parent
+      obj = {}
+      obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
+      obj
+    else
+      false
 
   create: (props) =>
     props = props or {}

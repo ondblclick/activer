@@ -1,6 +1,7 @@
 utils =
   extend: (dest, sources...) ->
     sources.forEach (object) ->
+      return unless object
       for key, value of object
         dest[key] = value
     dest

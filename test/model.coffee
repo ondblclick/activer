@@ -87,9 +87,10 @@ describe 'Model', ->
       expect(Post.where({ id: 20 }).length).to.eql 0
 
     it '#create', ->
-      expect(Post.all()).to.eql []
+      expect(Post.all().length).to.eql 0
       post = Post.create()
-      expect(Post.all()).to.eql [post]
+      expect(Post.all().length).to.eql 1
+      expect(Post.all()[0]).to.eql post
 
     it '#deleteAll (not triggering callbacks)', ->
       post1 = Post.create()
