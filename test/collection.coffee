@@ -23,6 +23,7 @@ describe 'Collection', ->
       post = Post.create()
       post.comments().create({ body: 'Some comment body' })
       expect(post.comments().where({ body: 'Some comment body' }).constructor.name).to.eql 'Collection'
+      expect(Comment.all().where({ body: 'Some comment body' }).constructor.name).to.eql 'Collection'
 
   describe 'returns proper value', ->
     it 'for hasMany relation', ->
@@ -45,6 +46,10 @@ describe 'Collection', ->
       expect(Post.where({ description: 'Some description' }).length).to.eql 2
       expect(Post.where({ description: 'Some description' }).where({ name: 'Some name' }).length).to.eql 1
       expect(Post.where({ description: 'Some description' }).where({ name: 'Some name' })[0]).to.deep.eql post1
+      expect(Post.all().length).to.eql 2
+      expect(Post.all().where({ description: 'Some description' }).where({ name: 'Some name' }).length).to.eql 1
+      expect(Post.all().where({ description: 'Some description' }).where({ name: 'Some name' })[0]).to.deep.eql post1
+      expect(Post.all().where().where().where().length).to.eql 2
 
   describe 'has method', ->
     it '#create', ->
