@@ -4,31 +4,49 @@ Post = require("./post")
 expect = require('chai').expect
 
 describe 'Collection', ->
-  describe 'is returned', ->
-    beforeEach ->
-      Post.deleteAll()
-      Comment.deleteAll()
+  beforeEach ->
+    Post.deleteAll()
+    Comment.deleteAll()
 
-    it 'for Model #where call', ->
+  describe 'is returned', ->
+    it 'for Model instance #where call', ->
       post = Post.create()
       post.comments().create({ body: 'Some comment body' })
       expect(Comment.where({ body: 'Some comment body' }).constructor.name).to.eql 'Collection'
 
-    it 'for Model #all call', ->
+    it 'for Model instance #all call', ->
       post = Post.create()
       post.comments().create()
       expect(Comment.all().constructor.name).to.eql 'Collection'
 
-    it 'for Collection #where call', ->
+    it 'for Collection instance #where call', ->
       post = Post.create()
       post.comments().create({ body: 'Some comment body' })
       expect(post.comments().where({ body: 'Some comment body' }).constructor.name).to.eql 'Collection'
 
-  describe 'has method', ->
-    beforeEach ->
-      Post.deleteAll()
-      Comment.deleteAll()
+  describe 'returns proper value', ->
+    it 'for hasMany relation', ->
+      post = Post.create()
+      comment1 = post.comments().create()
+      expect(post.comments().length).to.eq 1
+      expect(post.comments()[0].id).to.eq comment1.id
 
+    it 'for #where method called on Model', ->
+      post = Post.create()
+      expect(Post.where({ id: post.id })[0].id).to.eql post.id
+
+    it 'for #all method called on Model', ->
+      post = Post.create()
+      expect(Post.all()[0].id).to.eql post.id
+
+    it 'for #where method called on Collection', ->
+      post1 = Post.create({ name: 'Some name', description: 'Some description' })
+      post2 = Post.create({ name: 'Another name', description: 'Some description' })
+      expect(Post.where({ description: 'Some description' }).length).to.eql 2
+      expect(Post.where({ description: 'Some description' }).where({ name: 'Some name' }).length).to.eql 1
+      expect(Post.where({ description: 'Some description' }).where({ name: 'Some name' })[0].id).to.eql post1.id
+
+  describe 'has method', ->
     it '#create', ->
       post = Post.create()
       expect(post.comments().length).to.eql 0

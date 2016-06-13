@@ -1,35 +1,29 @@
 utils = require("./utils")
 
 class Collection extends Array
-  constructor: (@parent, @model, items...) ->
-    @push.apply(@, items)
+  constructor: (@params, @model, objects...) ->
+    @push.apply(@, objects.map(@_build))
 
-  _buildParentIdObj: =>
-    if @parent
-      obj = {}
-      obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
-      obj
-    else
-      null
+  _build: (obj) => @model.build(obj)
+  _destroy: (obj) -> obj.destroy()
 
   create: (props = {}) =>
-    @model.create(utils.extend(props, @_buildParentIdObj()))
+    newParams = utils.extend(props, @params)
+    @model.create(newParams)
 
   deleteAll: =>
-    @model.dao().removeAll(@_buildParentIdObj())
+    @model.dao().removeAll(@params)
 
   destroyAll: =>
-    @model.dao().getAll(@_buildParentIdObj()).map((obj) => @model.build(obj)).forEach((obj) -> obj.destroy())
+    @model.dao().getAll(@params).map(@_build).map(@_destroy)
 
-  where: (props) =>
-    new Collection(
-      @parent,
-      @model,
-      @model.dao().getAll(utils.extend(props, @_buildParentIdObj())).map((obj) => @model.build(obj))
-    )
+  where: (props = {}) =>
+    newParams = utils.extend(props, @params)
+    new Collection(newParams, @model, @model.dao().getAll(newParams)...)
 
   find: (id) ->
-    return unless @model.dao().get(id)
-    @model.build(@model.dao().get(id))
+    obj = @model.dao().get(id)
+    return unless obj
+    @model.build(obj)
 
 module.exports = Collection
