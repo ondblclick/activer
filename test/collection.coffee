@@ -4,7 +4,27 @@ Post = require("./post")
 expect = require('chai').expect
 
 describe 'Collection', ->
-  describe 'adds useful properties for collection returned by hasMany association', ->
+  describe 'is returned', ->
+    beforeEach ->
+      Post.deleteAll()
+      Comment.deleteAll()
+
+    it 'for Model #where call', ->
+      post = Post.create()
+      post.comments().create({ body: 'Some comment body' })
+      expect(Comment.where({ body: 'Some comment body' }).constructor.name).to.eql 'Collection'
+
+    it 'for Model #all call', ->
+      post = Post.create()
+      post.comments().create()
+      expect(Comment.all().constructor.name).to.eql 'Collection'
+
+    it 'for Collection #where call', ->
+      post = Post.create()
+      post.comments().create({ body: 'Some comment body' })
+      expect(post.comments().where({ body: 'Some comment body' }).constructor.name).to.eql 'Collection'
+
+  describe 'has method', ->
     beforeEach ->
       Post.deleteAll()
       Comment.deleteAll()
@@ -26,7 +46,6 @@ describe 'Collection', ->
       post = Post.create()
       comment = post.comments().create({ id: 1 })
       expect(post.comments().where({ id: 1 }).length).to.eql 1
-      expect(post.comments().where({ id: 1 }).constructor.name).to.eql 'Collection'
 
     it '#find', ->
       post = Post.create()
