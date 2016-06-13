@@ -26,6 +26,7 @@ describe 'Collection', ->
       post = Post.create()
       comment = post.comments().create({ id: 1 })
       expect(post.comments().where({ id: 1 }).length).to.eql 1
+      expect(post.comments().where({ id: 1 }).constructor.name).to.eql 'Collection'
 
     it '#find', ->
       post = Post.create()
