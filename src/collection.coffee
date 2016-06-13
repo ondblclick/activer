@@ -10,10 +10,9 @@ class Collection extends Array
       obj["#{utils.dfl(@parent.constructor.name)}Id"] = @parent.id
       obj
     else
-      false
+      null
 
-  create: (props) =>
-    props = props or {}
+  create: (props = {}) =>
     @model.create(utils.extend(props, @_buildParentIdObj()))
 
   deleteAll: =>
@@ -23,7 +22,11 @@ class Collection extends Array
     @model.dao().getAll(@_buildParentIdObj()).map((obj) => @model.build(obj)).forEach((obj) -> obj.destroy())
 
   where: (props) =>
-    @model.dao().getAll(utils.extend(props, @_buildParentIdObj())).map((obj) => @model.build(obj))
+    new Collection(
+      @parent,
+      @model,
+      @model.dao().getAll(utils.extend(props, @_buildParentIdObj())).map((obj) => @model.build(obj))
+    )
 
   find: (id) ->
     return unless @model.dao().get(id)

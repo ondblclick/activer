@@ -72,6 +72,7 @@ describe 'Model', ->
   it '#destroy', ->
 
   describe 'adds useful static method', ->
+    # TODO: check if collection is returned instead of array
     it '#all', ->
       [1..10].forEach -> Post.create()
       expect(Post.all().length).to.eql 10
@@ -81,6 +82,7 @@ describe 'Model', ->
       expect(Post.find(1)).to.not.eql undefined
       expect(Post.find(15)).to.eql undefined
 
+    # TODO: check if collection is returned instead of array
     it '#where', ->
       [1..10].forEach (index) -> Post.create({ id: index })
       expect(Post.where({ id: 1 }).length).to.eql 1
