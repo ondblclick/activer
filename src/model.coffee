@@ -67,7 +67,7 @@ class Model
       relationClass = Model._constructors[model]
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
-      new Collection(obj, relationClass, relationClass.dao().getAll(obj)...)
+      new Collection(obj, relationClass, relationClass.dao().getAll(obj))
 
   @attributes: (attributes...) ->
     if attributes.length
@@ -92,14 +92,14 @@ class Model
     instance
 
   @all: ->
-    new Collection({}, @, @dao().getAll()...)
+    new Collection({}, @, @dao().getAll())
 
   @find: (id) ->
     return unless @dao().get(id)
     @build(@dao().get(id))
 
   @where: (props = {}) ->
-    new Collection(props, @, @dao().getAll(props)...)
+    new Collection(props, @, @dao().getAll(props))
 
   @deleteAll: -> @dao().removeAll()
   @destroyAll: -> @all().forEach((obj) -> obj.destroy())
