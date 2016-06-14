@@ -1,5 +1,7 @@
 # activer
 
+[![Build Status](https://travis-ci.org/ondblclick/activer.svg?branch=master)](https://travis-ci.org/ondblclick/activer)
+
 Base class for your JavaScript models that adds useful `hasOne`, `hasMany`, `belongsTo`, `attributes` and `delegate` static methods (as well as `save`, `update` and `destroy` instance methods and a few callbacks).
 
 ## Usage
