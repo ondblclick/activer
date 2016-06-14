@@ -1,4 +1,5 @@
 Collection = require("./collection")
+ManyToManyCollection = require("./many_to_many_collection")
 utils = require("./utils")
 dao = require("./dao")
 
@@ -68,6 +69,27 @@ class Model
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
       new Collection(obj, relationClass, relationClass.dao().getAll(obj))
+
+  @hasAndBelongsToMany: (model, options) ->
+    @_addToConstructorsList(@)
+    @_addToRelationsList(model, options, 'hasAndBelongsToMany')
+
+    relationClass = Model._constructors[model]
+    joinClassName = [@name, model].sort((a, b) ->
+      return -1 if a < b
+      return 1 if a > b
+      return 0
+    ).join('')
+    joinClass = Model._constructors[joinClassName]
+
+    console.log Object.keys(Model._constructors)
+
+    @::["#{utils.dfl(model)}s"] = ->
+      obj = {}
+      obj["#{utils.dfl(@constructor.name)}Id"] = @id
+      joinTableObjects = joinClass.where(obj)
+      ids = joinTableObjects.map((obj) -> obj["#{utils.dfl(model)}Id"])
+      relationClass.dao().getAll().filter((obj) -> obj.id in ids)
 
   @attributes: (attributes...) ->
     if attributes.length

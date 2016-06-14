@@ -1,6 +1,8 @@
 Author = require("./author")
 Comment = require("./comment")
 Post = require("./post")
+Tag = require("./tag")
+PostTag = require("./post_tag")
 expect = require('chai').expect
 
 describe 'Model', ->
@@ -10,14 +12,23 @@ describe 'Model', ->
     Author.deleteAll()
 
   describe 'adds properties', ->
-    it 'for class with belongsTo method implemented', ->
+    it 'for class with hasAndBelongsToMany method called', ->
+      post = Post.create()
+      tag = Tag.create()
+      # postTag = PostTag.create({ postId: post.id, tagId: tag.id })
+      # expect(post.tags().length).to.eq 1
+      # expect(post.tags()[0]).to.eq [tag]
+      # expect(tag.posts().length).to.eq 1
+      # expect(tag.posts()[0]).to.eq [post]
+
+    it 'for class with belongsTo method called', ->
       post = Post.create()
       author1 = Author.create({ postId: post.id })
       expect(author1.post()).to.eql post
       author2 = Author.create({ postId: null })
       expect(author2.post()).to.eql null
 
-    it 'for class with hasOne method implemented', ->
+    it 'for class with hasOne method called', ->
       post1 = Post.create()
       post2 = Post.create()
       post3 = Post.create()
@@ -30,7 +41,7 @@ describe 'Model', ->
       expect(post2.author()).to.not.eql author2
       expect(post2.author()).to.eql author3
 
-    it 'for class with hasMany method implemented', ->
+    it 'for class with hasMany method called', ->
       post = Post.create()
       expect(post.comments().length).to.eq 0
       comment1 = Comment.create({ postId: post.id })
