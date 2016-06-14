@@ -8,13 +8,11 @@
   "scripts": {
     "clean": "rm -rf dist/*",
     "build": "coffee --compile --output dist src",
-    "watch": "onchange src -- npm test",
     "test": "mocha --compilers coffee:coffee-script/register"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "coffee-script": "^1.10.0",
-    "mocha": "^2.4.5",
-    "onchange": "^2.0.0"
+    "mocha": "^2.4.5"
   }
 }
