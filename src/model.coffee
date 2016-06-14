@@ -31,50 +31,50 @@ class Model
     @attributes("#{utils.dfl(model)}Id")
 
     @::[utils.dfl(model)] = ->
-      relationClass = Model._constructors[model]
-      record = relationClass.dao().get(@["#{utils.dfl(model)}Id"])
+      record = Model._constructors[model].dao().get(@["#{utils.dfl(model)}Id"])
       return null unless record
-      relationClass.build(record)
+      Model._constructors[model].build(record)
 
   @hasOne: (model, options) ->
     @_addToConstructorsList(@)
     @_addToRelationsList(model, options, 'hasOne')
 
     @::[utils.dfl(model)] = ->
-      relationClass = Model._constructors[model]
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
-      record = relationClass.dao().getAll(obj)[0]
+      record = Model._constructors[model].dao().getAll(obj)[0]
       return null unless record
-      relationClass.build(record)
+      Model._constructors[model].build(record)
 
     @::["create#{model}"] = (props = {}) ->
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
-      relationClass = Model._constructors[model]
 
       # check if relation is already there and remove it
-      record = relationClass.dao().getAll(obj)[0]
-      relationClass.dao().remove(record.id) if record
+      record = Model._constructors[model].dao().getAll(obj)[0]
+      Model._constructors[model].dao().remove(record.id) if record
 
       # create new relation
-      relationClass.create(utils.extend(props, obj))
+      Model._constructors[model].create(utils.extend(props, obj))
 
   @hasMany: (model, options) ->
     @_addToConstructorsList(@)
     @_addToRelationsList(model, options, 'hasMany')
 
     @::["#{utils.dfl(model)}s"] = ->
-      relationClass = Model._constructors[model]
+      # relationClass = Model._constructors[model]
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
-      new Collection(obj, relationClass, relationClass.dao().getAll(obj))
+      new Collection(
+        obj,
+        Model._constructors[model],
+        Model._constructors[model].dao().getAll(obj)
+      )
 
   @hasAndBelongsToMany: (model, options) ->
     @_addToConstructorsList(@)
     @_addToRelationsList(model, options, 'hasAndBelongsToMany')
 
-    relationClass = Model._constructors[model]
     joinClassName = [@name, model].sort((a, b) ->
       return -1 if a < b
       return 1 if a > b
@@ -82,14 +82,16 @@ class Model
     ).join('')
     joinClass = Model._constructors[joinClassName]
 
-    console.log Object.keys(Model._constructors)
-
     @::["#{utils.dfl(model)}s"] = ->
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
       joinTableObjects = joinClass.where(obj)
       ids = joinTableObjects.map((obj) -> obj["#{utils.dfl(model)}Id"])
-      relationClass.dao().getAll().filter((obj) -> obj.id in ids)
+      new ManyToManyCollection(
+        obj,
+        Model._constructors[model],
+        Model._constructors[model].dao().getAll().filter((obj) -> obj.id in ids)
+      )
 
   @attributes: (attributes...) ->
     if attributes.length

@@ -15,11 +15,11 @@ describe 'Model', ->
     it 'for class with hasAndBelongsToMany method called', ->
       post = Post.create()
       tag = Tag.create()
-      # postTag = PostTag.create({ postId: post.id, tagId: tag.id })
-      # expect(post.tags().length).to.eq 1
-      # expect(post.tags()[0]).to.eq [tag]
-      # expect(tag.posts().length).to.eq 1
-      # expect(tag.posts()[0]).to.eq [post]
+      postTag = PostTag.create({ postId: post.id, tagId: tag.id })
+      expect(post.tags().length).to.eq 1
+      expect(post.tags()[0]).to.deep.eq tag
+      expect(tag.posts().length).to.eq 1
+      expect(tag.posts()[0]).to.deep.eq post
 
     it 'for class with belongsTo method called', ->
       post = Post.create()
