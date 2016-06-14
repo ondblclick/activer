@@ -75,6 +75,7 @@ describe 'Model', ->
     it '#all', ->
       [1..10].forEach -> Post.create()
       expect(Post.all().length).to.eql 10
+      expect(Post.all().constructor.name).to.eql 'Collection'
 
     it '#find', ->
       [1..10].forEach (index) -> Post.create({ id: index })
@@ -85,11 +86,13 @@ describe 'Model', ->
       [1..10].forEach (index) -> Post.create({ id: index })
       expect(Post.where({ id: 1 }).length).to.eql 1
       expect(Post.where({ id: 20 }).length).to.eql 0
+      expect(Post.where({ id: 20 }).constructor.name).to.eql 'Collection'
 
     it '#create', ->
-      expect(Post.all()).to.eql []
+      expect(Post.all().length).to.eql 0
       post = Post.create()
-      expect(Post.all()).to.eql [post]
+      expect(Post.all().length).to.eql 1
+      expect(Post.all()[0]).to.eql post
 
     it '#deleteAll (not triggering callbacks)', ->
       post1 = Post.create()

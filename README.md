@@ -4,7 +4,7 @@ Base class for your JavaScript models that adds useful `hasOne`, `hasMany`, `bel
 
 ## Usage
 
-in your user.js:
+in your `user.js`:
 ```javascript
 import Model from 'activer';
 import Post from './post'
@@ -20,7 +20,7 @@ User.delegate('saySomething', 'Post');
 export default User
 ```
 
-in your comment.js:
+in your `comment.js`:
 ```javascript
 import Model from 'activer';
 import Post from './post';
@@ -35,7 +35,7 @@ Comment.belongsTo('Post');
 export default Comment
 ```
 
-in your post.js:
+in your `post.js`:
 ```javascript
 import Model from 'activer';
 import User from './user';
@@ -52,7 +52,7 @@ Post.hasMany('Comment', { dependent: 'destroy' });
 export default Post
 ```
 
-in your main.js:
+in your `main.js`:
 ```javascript
 import User from './user';
 import Comment from './comment';
@@ -90,3 +90,9 @@ dataAccessObject = {
 class User extends Model {}
 User.collection(dataAccessObject)
 ```
+
+See default implementation in `src/dao.coffee`.
+
+## Changelog
+
+0.10.0: Model static methods `all` and `where` now return Collection instance. Collection instance method `where` now returns new Collection instance. One can do `User.all().where({ something: 'something' }).where({ anotherThing: 'Another thing' }).deleteAll()` now.
