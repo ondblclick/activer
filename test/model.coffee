@@ -14,12 +14,17 @@ describe 'Model', ->
   describe 'adds properties', ->
     it 'for class with hasAndBelongsToMany method called', ->
       post = Post.create()
-      tag = Tag.create()
-      postTag = PostTag.create({ postId: post.id, tagId: tag.id })
-      expect(post.tags().length).to.eq 1
-      expect(post.tags()[0]).to.deep.eq tag
-      expect(tag.posts().length).to.eq 1
-      expect(tag.posts()[0]).to.deep.eq post
+      tag1 = Tag.create({ name: 'Tag name 1' })
+      tag2 = Tag.create({ name: 'Tag name 2' })
+      tag3 = Tag.create({ name: 'Tag name 3' })
+      PostTag.create({ postId: post.id, tagId: tag1.id })
+      PostTag.create({ postId: post.id, tagId: tag2.id })
+      PostTag.create({ postId: post.id, tagId: tag3.id })
+      expect(post.tags().length).to.eq 3
+      expect(post.tags()[0]).to.deep.eq tag1
+      expect(post.tags().where({ name: ['Tag name 1', 'Tag name 2'] }).length).to.eq 2
+      expect(tag1.posts().length).to.eq 1
+      expect(tag1.posts()[0]).to.deep.eq post
 
     it 'for class with belongsTo method called', ->
       post = Post.create()

@@ -90,7 +90,7 @@ class Model
       joinTableObjects = joinClass.where(obj)
       ids = joinTableObjects.map((obj) -> obj["#{utils.dfl(model)}Id"])
       new ManyToManyCollection(
-        obj,
+        { id: ids },
         Model._getClass(model),
         Model._getClass(model).dao().getAll().filter((obj) -> obj.id in ids)
       )
