@@ -73,11 +73,7 @@ class Model
     @_addToConstructorsList(@)
     @_addToRelationsList(model, options, 'hasAndBelongsToMany')
 
-    joinClassName = [@name, model].sort((a, b) ->
-      return -1 if a < b
-      return 1 if a > b
-      return 0
-    ).join('')
+    joinClassName = [model, @name].sort().join('')
 
     @::["#{utils.dfl(model)}s"] = ->
       obj = {}
@@ -98,7 +94,7 @@ class Model
   @build: (props = {}) ->
     instance = new @()
     Object.keys(props).forEach (prop) =>
-      instance[prop] = props[prop] if prop in @attributes()
+      instance[prop] = props[prop] if prop in @attributes() and !Array.isArray(props[prop])
     instance
 
   @create: (props = {}) ->

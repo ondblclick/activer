@@ -58,6 +58,26 @@ describe 'Collection', ->
       post.comments().create()
       expect(post.comments().length).to.eql 1
 
+    it '#create called on collection filtered by #where', ->
+      post = Post.create()
+      expect(post.comments().length).to.eql 0
+      post.comments().create({ body: 'Somebody' })
+      post.comments().create({ body: 'Anotherbody' })
+      expect(post.comments().length).to.eql 2
+      comm = post.comments().where({ body: 'Somebody' }).create()
+      expect(post.comments().length).to.eql 3
+      expect(comm.body).to.eq 'Somebody'
+
+    it '#create called on collection filtered by #where with array', ->
+      post = Post.create()
+      expect(post.comments().length).to.eql 0
+      post.comments().create({ body: 'Somebody' })
+      post.comments().create({ body: 'Anotherbody' })
+      expect(post.comments().length).to.eql 2
+      comm = post.comments().where({ body: ['Somebody', 'Anotherbody'] }).create()
+      expect(post.comments().length).to.eql 3
+      expect(comm.body).to.eq undefined
+
     it '#deleteAll', ->
       post = Post.create()
       post.comments().create({ id: 1 })
