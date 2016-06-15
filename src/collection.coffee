@@ -4,8 +4,11 @@ class Collection extends Array
   constructor: (@params, @model) ->
     @push.apply(@, @model.dao().getAll(@params).map(@_build))
 
-  _build: (obj) => @model.build(obj)
-  _destroy: (obj) -> obj.destroy()
+  _build: (obj) =>
+    @model.build(obj)
+
+  _destroy: (obj) ->
+    obj.destroy()
 
   create: (props = {}) =>
     newParams = utils.extend(props, @params)

@@ -74,13 +74,18 @@ class Model
     @_addToRelationsList(model, options, 'hasAndBelongsToMany')
 
     joinClassName = [model, @name].sort().join('')
+    klass = @
 
     @::["#{utils.dfl(model)}s"] = ->
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
       joinTableObjects = Model._getClass(joinClassName).where(obj)
       ids = joinTableObjects.map((obj) -> obj["#{utils.dfl(model)}Id"])
-      new ManyToManyCollection({ id: ids }, Model._getClass(model))
+      new ManyToManyCollection(
+        { id: ids },
+        Model._getClass(model),
+        { joinModel: Model._getClass(joinClassName), model: klass, id: @id }
+      )
 
   @attributes: (attributes...) ->
     if attributes.length
@@ -114,8 +119,11 @@ class Model
   @where: (props = {}) ->
     new Collection(props, @)
 
-  @deleteAll: -> @dao().removeAll()
-  @destroyAll: -> @all().forEach((obj) -> obj.destroy())
+  @deleteAll: ->
+    @dao().removeAll()
+
+  @destroyAll: ->
+    @all().forEach((obj) -> obj.destroy())
 
   @collection: (@externalDao) ->
 

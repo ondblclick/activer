@@ -1,6 +1,8 @@
 Collection = require('../src/collection')
 Comment = require("./comment")
 Post = require("./post")
+Tag = require("./tag")
+PostTag = require("./post_tag")
 expect = require('chai').expect
 
 describe 'Collection', ->
@@ -58,7 +60,7 @@ describe 'Collection', ->
       post.comments().create()
       expect(post.comments().length).to.eql 1
 
-    it '#create called on collection filtered by #where', ->
+    it '#create called on collection filtered by #where without arrays', ->
       post = Post.create()
       expect(post.comments().length).to.eql 0
       post.comments().create({ body: 'Somebody' })
@@ -77,6 +79,18 @@ describe 'Collection', ->
       comm = post.comments().where({ body: ['Somebody', 'Anotherbody'] }).create()
       expect(post.comments().length).to.eql 3
       expect(comm.body).to.eq undefined
+
+    it '#create called on collection returned by hasAndBelongsToMany association', ->
+      post1 = Post.create()
+      post2 = Post.create()
+      tag1 = Tag.create({ name: 'tag 1' })
+      tag2 = Tag.create({ name: 'tag 1' })
+      PostTag.create({ postId: post1.id, tagId: tag1.id })
+      PostTag.create({ postId: post2.id, tagId: tag2.id })
+      expect(PostTag.all().length).to.eq 2
+      tag2 = post1.tags().create({ name: 'tag 2' })
+      expect(PostTag.all().length).to.eq 3
+      expect(post1.tags().length).to.eq 2
 
     it '#deleteAll', ->
       post = Post.create()
