@@ -99,6 +99,11 @@ describe 'Model', ->
       expect(Post.where({ id: 20 }).length).to.eql 0
       expect(Post.where({ id: 20 }).constructor.name).to.eql 'Collection'
 
+    it '#where with array', ->
+      [1..10].forEach (index) -> Post.create({ id: index, name: "Post name #{index % 2}" })
+      expect(Post.where({ id: [1, 2, 3] }).length).to.eql 3
+      expect(Post.where({ id: [1, 2, 3, 4], name: "Post name 1" }).length).to.eql 2
+
     it '#create', ->
       expect(Post.all().length).to.eql 0
       post = Post.create()
