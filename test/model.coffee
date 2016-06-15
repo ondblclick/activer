@@ -2,7 +2,9 @@ Author = require("./author")
 Comment = require("./comment")
 Post = require("./post")
 Tag = require("./tag")
+Category = require("./category")
 PostTag = require("./post_tag")
+CategoryPost = require("./category_post")
 expect = require('chai').expect
 
 describe 'Model', ->
@@ -25,6 +27,20 @@ describe 'Model', ->
       expect(post.tags().where({ name: ['Tag name 1', 'Tag name 2'] }).length).to.eq 2
       expect(tag1.posts().length).to.eq 1
       expect(tag1.posts()[0]).to.deep.eq post
+
+    it 'for class with hasMany { through: } method called', ->
+      post = Post.create()
+      category1 = Category.create({ name: 'Category name 1' })
+      category2 = Category.create({ name: 'Category name 2' })
+      category3 = Category.create({ name: 'Category name 3' })
+      CategoryPost.create({ postId: post.id, categoryId: category1.id })
+      CategoryPost.create({ postId: post.id, categoryId: category2.id })
+      CategoryPost.create({ postId: post.id, categoryId: category3.id })
+      expect(post.categorys().length).to.eq 3
+      expect(post.categorys()[0]).to.deep.eq category1
+      expect(post.categorys().where({ name: ['Category name 1', 'Category name 2'] }).length).to.eq 2
+      expect(category1.posts().length).to.eq 1
+      expect(category1.posts()[0]).to.deep.eq post
 
     it 'for class with belongsTo method called', ->
       post = Post.create()

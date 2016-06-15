@@ -75,9 +75,58 @@ console.log(user.post()); // undefined
 
 See tests for details.
 
+## hasMany { through: 'SomeClass' }
+
+To be able to use the hasMany through association the join collection model should be implemented. See example below.
+
+in your `post.js`:
+```javascript
+
+import Model from 'activer';
+import Category from './category';
+import CategoryPost from './category_post';
+
+class Post extends Model {}
+
+Post.attributes('name', 'description');
+Post.hasMany('Category', { through: 'CategoryPost' });
+
+export default Post
+```
+
+in your `category.js`:
+```javascript
+
+import Model from 'activer';
+import Post from './post';
+import CategoryPost from './category_post';
+
+class Category extends Model {}
+
+Category.attributes('name');
+Category.hasMany('Post', { through: 'CategoryPost' });
+
+export default Category
+```
+
+in your `category_post.js` (please note class names in the join collection are sorted alphabetically, and they should be):
+```javascript
+
+import Model from 'activer';
+import Post from './post';
+import Category from './category';
+
+class CategoryPost extends Model {}
+
+CategoryPost.belongsTo('Post');
+CategoryPost.belongsTo('Category');
+
+export default CategoryPost
+```
+
 ## HABTM
 
-To be able to use the hasAdnBelongsToMany association the join collection model should be implemented. See example below.
+To be able to use the hasAndBelongsToMany association the join collection model should be implemented. See example below.
 
 in your `post.js`:
 ```javascript
@@ -148,4 +197,4 @@ See default implementation in `src/dao.coffee`.
 
 0.10.0: Model static methods `all` and `where` now return Collection instance. Collection instance method `where` now returns new Collection instance. One can do `User.all().where({ something: 'something' }).where({ anotherThing: 'Another thing' }).deleteAll()` now.
 
-0.11.0: `hasAndBelongsToMany` association implemented.
+0.11.0: `hasAndBelongsToMany` association implemented. `hasMany { through }` association implemented.

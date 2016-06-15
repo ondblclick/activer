@@ -64,10 +64,29 @@ class Model
     @_addToConstructorsList(@)
     @_addToRelationsList(model, options, 'hasMany')
 
-    @::["#{utils.dfl(model)}s"] = ->
-      obj = {}
-      obj["#{utils.dfl(@constructor.name)}Id"] = @id
-      new Collection(obj, Model._getClass(model))
+    if options and options.through
+      # if many-to-many
+      joinClassName = options.through
+      klass = @
+
+      # the same as HABTM, most likely
+      @::["#{utils.dfl(model)}s"] = ->
+        obj = {}
+        obj["#{utils.dfl(@constructor.name)}Id"] = @id
+        joinTableObjects = Model._getClass(joinClassName).where(obj)
+        ids = joinTableObjects.map((obj) -> obj["#{utils.dfl(model)}Id"])
+        new ManyToManyCollection(
+          { id: ids },
+          Model._getClass(model),
+          { joinModel: Model._getClass(joinClassName), model: klass, id: @id }
+        )
+
+    else
+      # if direct has_many
+      @::["#{utils.dfl(model)}s"] = ->
+        obj = {}
+        obj["#{utils.dfl(@constructor.name)}Id"] = @id
+        new Collection(obj, Model._getClass(model))
 
   @hasAndBelongsToMany: (model, options) ->
     @_addToConstructorsList(@)
@@ -75,6 +94,11 @@ class Model
 
     joinClassName = [model, @name].sort().join('')
     klass = @
+
+    # @::["#{utils.dfl(joinClassName)}s"] = ->
+    #   obj = {}
+    #   obj["#{utils.dfl(@constructor.name)}Id"] = @id
+    #   new Collection(obj, Model._getClass(joinClassName))
 
     @::["#{utils.dfl(model)}s"] = ->
       obj = {}
@@ -151,9 +175,14 @@ class Model
 
     @constructor._getRelationsToBeDeleted().forEach (relation) =>
       if relation.type is 'hasMany'
-        @["#{utils.dfl(relation.name)}s"]().deleteAll()
+        @["#{utils.dfl(relation.name)}s"]().destroyAll()
       if relation.type is 'hasOne' or relation.type is 'belongsTo'
         @[utils.dfl(relation.name)]().destroy()
+
+      # HABTM should not support dependent destroy :)
+      # if relation.type is 'hasAndBelongsToMany'
+      #   @["#{utils.dfl(relation.name)}s"]().destroyAll()
+      #   @["#{utils.dfl([@constructor.name, relation.name].sort().join(''))}s"]().destroyAll()
 
     @afterDestroy()
 
