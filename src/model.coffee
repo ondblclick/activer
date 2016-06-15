@@ -69,8 +69,7 @@ class Model
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
       new Collection(
         obj,
-        Model._getClass(model),
-        Model._getClass(model).dao().getAll(obj)
+        Model._getClass(model)
       )
 
   @hasAndBelongsToMany: (model, options) ->
@@ -91,8 +90,7 @@ class Model
       ids = joinTableObjects.map((obj) -> obj["#{utils.dfl(model)}Id"])
       new ManyToManyCollection(
         { id: ids },
-        Model._getClass(model),
-        Model._getClass(model).dao().getAll().filter((obj) -> obj.id in ids)
+        Model._getClass(model)
       )
 
   @attributes: (attributes...) ->
@@ -118,14 +116,14 @@ class Model
     instance
 
   @all: ->
-    new Collection({}, @, @dao().getAll())
+    new Collection({}, @)
 
   @find: (id) ->
     return unless @dao().get(id)
     @build(@dao().get(id))
 
   @where: (props = {}) ->
-    new Collection(props, @, @dao().getAll(props))
+    new Collection(props, @)
 
   @deleteAll: -> @dao().removeAll()
   @destroyAll: -> @all().forEach((obj) -> obj.destroy())

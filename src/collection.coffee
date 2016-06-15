@@ -1,8 +1,8 @@
 utils = require("./utils")
 
 class Collection extends Array
-  constructor: (@params, @model, objects) ->
-    @push.apply(@, objects.map(@_build))
+  constructor: (@params, @model) ->
+    @push.apply(@, @model.dao().getAll(@params).map(@_build))
 
   _build: (obj) => @model.build(obj)
   _destroy: (obj) -> obj.destroy()
@@ -19,7 +19,7 @@ class Collection extends Array
 
   where: (props = {}) =>
     newParams = utils.extend(props, @params)
-    new Collection(newParams, @model, @model.dao().getAll(newParams))
+    new Collection(newParams, @model)
 
   find: (id) ->
     obj = @model.dao().get(id)
