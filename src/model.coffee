@@ -170,8 +170,6 @@ class Model
   destroy: ->
     @remove()
 
-    # well, join collection itsm should be destroyed as well
-
     @constructor._getRelationsToBeDeleted().forEach (relation) =>
       if relation.type is 'hasMany'
         if relation.options and relation.options.through
@@ -181,6 +179,11 @@ class Model
           @["#{utils.dfl(relation.name)}s"]().destroyAll()
       if relation.type is 'hasOne' or relation.type is 'belongsTo'
         @[utils.dfl(relation.name)]().destroy()
+
+    for key, value of @constructor._relations
+      return unless value.type is 'hasMany'
+      if value.options and value.options.through
+        @["#{utils.dfl(value.options.through)}s"]().destroyAll()
 
     @afterDestroy()
 

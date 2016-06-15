@@ -13,6 +13,7 @@ describe 'Model', ->
     Comment.deleteAll()
     Author.deleteAll()
     Category.deleteAll()
+    CategoryPost.deleteAll()
 
   describe 'adds properties', ->
     it 'for class with hasAndBelongsToMany method called', ->
@@ -142,10 +143,12 @@ describe 'Model', ->
       expect(Post.all().length).to.eq 2
       expect(Author.all().length).to.eq 2
       expect(Category.all().length).to.eq 2
+      expect(CategoryPost.all().length).to.eq 2
       Post.deleteAll()
       expect(Post.all().length).to.eq 0
       expect(Author.all().length).to.eq 2
       expect(Category.all().length).to.eq 2
+      expect(CategoryPost.all().length).to.eq 2
 
     it '#destroyAll (triggering callbacks)', ->
       post1 = Post.create()
@@ -157,10 +160,12 @@ describe 'Model', ->
       expect(Post.all().length).to.eq 2
       expect(Author.all().length).to.eq 2
       expect(Category.all().length).to.eq 2
+      expect(CategoryPost.all().length).to.eq 2
       Post.destroyAll()
       expect(Post.all().length).to.eq 0
       expect(Author.all().length).to.eq 0
       expect(Category.all().length).to.eq 0
+      expect(CategoryPost.all().length).to.eq 0
 
     it '#delegate', ->
       post = Post.create()
