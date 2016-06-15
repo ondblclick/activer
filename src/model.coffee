@@ -65,11 +65,14 @@ class Model
     @_addToRelationsList(model, options, 'hasMany')
 
     if options and options.through
-      # if many-to-many
       joinClassName = options.through
       klass = @
 
-      # the same as HABTM, most likely
+      @::["#{utils.dfl(joinClassName)}s"] = ->
+        obj = {}
+        obj["#{utils.dfl(@constructor.name)}Id"] = @id
+        new Collection(obj, Model._getClass(joinClassName))
+
       @::["#{utils.dfl(model)}s"] = ->
         obj = {}
         obj["#{utils.dfl(@constructor.name)}Id"] = @id
@@ -82,7 +85,6 @@ class Model
         )
 
     else
-      # if direct has_many
       @::["#{utils.dfl(model)}s"] = ->
         obj = {}
         obj["#{utils.dfl(@constructor.name)}Id"] = @id
@@ -94,11 +96,6 @@ class Model
 
     joinClassName = [model, @name].sort().join('')
     klass = @
-
-    # @::["#{utils.dfl(joinClassName)}s"] = ->
-    #   obj = {}
-    #   obj["#{utils.dfl(@constructor.name)}Id"] = @id
-    #   new Collection(obj, Model._getClass(joinClassName))
 
     @::["#{utils.dfl(model)}s"] = ->
       obj = {}
@@ -173,16 +170,17 @@ class Model
   destroy: ->
     @remove()
 
+    # well, join collection itsm should be destroyed as well
+
     @constructor._getRelationsToBeDeleted().forEach (relation) =>
       if relation.type is 'hasMany'
-        @["#{utils.dfl(relation.name)}s"]().destroyAll()
+        if relation.options and relation.options.through
+          @["#{utils.dfl(relation.name)}s"]().destroyAll()
+          @["#{utils.dfl(relation.options.through)}s"]().destroyAll()
+        else
+          @["#{utils.dfl(relation.name)}s"]().destroyAll()
       if relation.type is 'hasOne' or relation.type is 'belongsTo'
         @[utils.dfl(relation.name)]().destroy()
-
-      # HABTM should not support dependent destroy :)
-      # if relation.type is 'hasAndBelongsToMany'
-      #   @["#{utils.dfl(relation.name)}s"]().destroyAll()
-      #   @["#{utils.dfl([@constructor.name, relation.name].sort().join(''))}s"]().destroyAll()
 
     @afterDestroy()
 
