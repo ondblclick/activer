@@ -67,10 +67,7 @@ class Model
     @::["#{utils.dfl(model)}s"] = ->
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
-      new Collection(
-        obj,
-        Model._getClass(model)
-      )
+      new Collection(obj, Model._getClass(model))
 
   @hasAndBelongsToMany: (model, options) ->
     @_addToConstructorsList(@)
@@ -81,17 +78,13 @@ class Model
       return 1 if a > b
       return 0
     ).join('')
-    joinClass = Model._constructors[joinClassName]
 
     @::["#{utils.dfl(model)}s"] = ->
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
-      joinTableObjects = joinClass.where(obj)
+      joinTableObjects = Model._getClass(joinClassName).where(obj)
       ids = joinTableObjects.map((obj) -> obj["#{utils.dfl(model)}Id"])
-      new ManyToManyCollection(
-        { id: ids },
-        Model._getClass(model)
-      )
+      new ManyToManyCollection({ id: ids }, Model._getClass(model))
 
   @attributes: (attributes...) ->
     if attributes.length
