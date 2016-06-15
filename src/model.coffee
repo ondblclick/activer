@@ -147,12 +147,14 @@ class Model
   destroy: ->
     @remove()
 
+    # removing all dependent: destroy relations
     @constructor._getRelationsToBeDeleted().forEach (relation) =>
       if relation.type is 'hasMany'
         @["#{utils.dfl(relation.name)}s"]().destroyAll()
       if relation.type is 'hasOne' or relation.type is 'belongsTo'
         @[utils.dfl(relation.name)]().destroy()
 
+    # removing join table
     for key, value of @constructor._relations
       return unless value.type is 'hasMany'
       if value.options and value.options.through
