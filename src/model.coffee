@@ -1,5 +1,5 @@
 Collection = require("./collection")
-ManyToManyCollection = require("./many_to_many_collection")
+Relation = require('./relation')
 utils = require("./utils")
 dao = require("./dao")
 
@@ -34,20 +34,14 @@ class Model
     @attributes("#{utils.dfl(model)}Id")
 
     @::[utils.dfl(model)] = ->
-      record = Model._getClass(model).dao().get(@["#{utils.dfl(model)}Id"])
-      return null unless record
-      Model._getClass(model).build(record)
+      Relation.belongsTo(@, Model._getClass(model))
 
   @hasOne: (model, options) ->
     @_addToConstructorsList(@)
     @_addToRelationsList(model, options, 'hasOne')
 
     @::[utils.dfl(model)] = ->
-      obj = {}
-      obj["#{utils.dfl(@constructor.name)}Id"] = @id
-      record = Model._getClass(model).dao().getAll(obj)[0]
-      return null unless record
-      Model._getClass(model).build(record)
+      Relation.hasOne(@, Model._getClass(model))
 
     @::["create#{model}"] = (props = {}) ->
       obj = {}
@@ -69,26 +63,14 @@ class Model
       klass = @
 
       @::["#{utils.dfl(joinClassName)}s"] = ->
-        obj = {}
-        obj["#{utils.dfl(@constructor.name)}Id"] = @id
-        new Collection(obj, Model._getClass(joinClassName))
+        Relation.hasMany(@, Model._getClass(joinClassName))
 
       @::["#{utils.dfl(model)}s"] = ->
-        obj = {}
-        obj["#{utils.dfl(@constructor.name)}Id"] = @id
-        joinTableObjects = Model._getClass(joinClassName).where(obj)
-        ids = joinTableObjects.map((obj) -> obj["#{utils.dfl(model)}Id"])
-        new ManyToManyCollection(
-          { id: ids },
-          Model._getClass(model),
-          { joinModel: Model._getClass(joinClassName), model: klass, id: @id }
-        )
+        Relation.manyToMany(@, Model._getClass(joinClassName), Model._getClass(model), klass)
 
     else
       @::["#{utils.dfl(model)}s"] = ->
-        obj = {}
-        obj["#{utils.dfl(@constructor.name)}Id"] = @id
-        new Collection(obj, Model._getClass(model))
+        Relation.hasMany(@, Model._getClass(model))
 
   @hasAndBelongsToMany: (model, options) ->
     @_addToConstructorsList(@)
@@ -97,16 +79,11 @@ class Model
     joinClassName = [model, @name].sort().join('')
     klass = @
 
+    @::["#{utils.dfl(joinClassName)}s"] = ->
+      Relation.hasMany(@, Model._getClass(joinClassName))
+
     @::["#{utils.dfl(model)}s"] = ->
-      obj = {}
-      obj["#{utils.dfl(@constructor.name)}Id"] = @id
-      joinTableObjects = Model._getClass(joinClassName).where(obj)
-      ids = joinTableObjects.map((obj) -> obj["#{utils.dfl(model)}Id"])
-      new ManyToManyCollection(
-        { id: ids },
-        Model._getClass(model),
-        { joinModel: Model._getClass(joinClassName), model: klass, id: @id }
-      )
+      Relation.manyToMany(@, Model._getClass(joinClassName), Model._getClass(model), klass)
 
   @attributes: (attributes...) ->
     if attributes.length
