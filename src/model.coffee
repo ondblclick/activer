@@ -149,11 +149,7 @@ class Model
 
     @constructor._getRelationsToBeDeleted().forEach (relation) =>
       if relation.type is 'hasMany'
-        if relation.options and relation.options.through
-          @["#{utils.dfl(relation.name)}s"]().destroyAll()
-          @["#{utils.dfl(relation.options.through)}s"]().destroyAll()
-        else
-          @["#{utils.dfl(relation.name)}s"]().destroyAll()
+        @["#{utils.dfl(relation.name)}s"]().destroyAll()
       if relation.type is 'hasOne' or relation.type is 'belongsTo'
         @[utils.dfl(relation.name)]().destroy()
 
