@@ -93,6 +93,7 @@ class Model
         @_fields = utils.uniq(@_fields)
     else
       @_fields or ['id']
+    @_fields
 
   @build: (props = {}) ->
     instance = new @()
@@ -120,10 +121,10 @@ class Model
     new Collection(props, @)
 
   @deleteAll: ->
-    @dao().removeAll()
+    new Collection({}, @).deleteAll()
 
   @destroyAll: ->
-    @all().forEach((obj) -> obj.destroy())
+    new Collection({}, @).destroyAll()
 
   @collection: (@externalDao) ->
 
@@ -154,7 +155,7 @@ class Model
       if relation.type is 'hasMany'
         @["#{utils.dfl(relation.name)}s"]().destroyAll()
       if relation.type in ['hasOne', 'belongsTo']
-        @[utils.dfl(relation.name)]().destroy()
+        @[utils.dfl(relation.name)]().destroy() if @[utils.dfl(relation.name)]()
 
     # removing join table records
     for key, value of @constructor._relations

@@ -108,3 +108,16 @@ describe 'Collection', ->
       post = Post.create()
       comment = post.comments().create({ id: 1 })
       expect(post.comments().find(1)).to.deep.eql comment
+
+describe 'Collection', ->
+  describe 'static', ->
+    describe '#create', ->
+    describe '#deleteAll', ->
+    describe '#destroyAll', ->
+    describe '#where', ->
+    describe '#find', ->
+
+describe 'ManyToManyCollection', ->
+  describe 'static', ->
+    describe '#create', ->
+    describe '#where', ->
