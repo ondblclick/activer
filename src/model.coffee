@@ -108,8 +108,7 @@ class Model
     new Collection({}, @)
 
   @find: (id) ->
-    return unless @dao().get(id)
-    @build(@dao().get(id))
+    new Collection({}, @).find(id)
 
   @where: (props = {}) ->
     new Collection(props, @)
@@ -144,14 +143,14 @@ class Model
   destroy: ->
     @remove()
 
-    # removing all dependent: destroy relations
+    # remove all dependent: destroy relations
     @constructor._getRelationsToBeDeleted().forEach (relation) =>
       if relation.type is 'hasMany'
         @["#{utils.dfl(relation.name)}s"]().destroyAll()
       if relation.type in ['hasOne', 'belongsTo']
         @[utils.dfl(relation.name)]().destroy() if @[utils.dfl(relation.name)]()
 
-    # removing join table records
+    # remove join table records
     for key, value of @constructor._relations
       return unless value.type is 'hasMany'
       if value.options and value.options.through
