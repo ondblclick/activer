@@ -81,7 +81,6 @@ To be able to use the hasMany through association the join collection model shou
 
 in your `post.js`:
 ```javascript
-
 import Model from 'activer';
 import Category from './category';
 import CategoryPost from './category_post';
@@ -96,7 +95,6 @@ export default Post
 
 in your `category.js`:
 ```javascript
-
 import Model from 'activer';
 import Post from './post';
 import CategoryPost from './category_post';
@@ -111,7 +109,6 @@ export default Category
 
 in your `category_post.js` (please note class names in the join collection are sorted alphabetically, and they should be):
 ```javascript
-
 import Model from 'activer';
 import Post from './post';
 import Category from './category';
@@ -130,7 +127,6 @@ To be able to use the hasAndBelongsToMany association the join collection model 
 
 in your `post.js`:
 ```javascript
-
 import Model from 'activer';
 import Tag from './tag';
 import PostTag from './post_tag';
@@ -145,7 +141,6 @@ export default Post
 
 in your `tag.js`:
 ```javascript
-
 import Model from 'activer';
 import Post from './post';
 import PostTag from './post_tag';
@@ -160,7 +155,6 @@ export default Tag
 
 in your `post_tag.js` (please note class names in the join collection are sorted alphabetically, and they should be):
 ```javascript
-
 import Model from 'activer';
 import Post from './post';
 import Tag from './tag';
