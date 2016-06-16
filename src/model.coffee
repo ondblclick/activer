@@ -76,9 +76,6 @@ class Model
     joinClassName = [model, @name].sort().join('')
     klass = @
 
-    @::["#{utils.dfl(joinClassName)}s"] = ->
-      Relation.hasMany(@, Model._getClass(joinClassName))
-
     @::["#{utils.dfl(model)}s"] = ->
       Relation.manyToMany(@, Model._getClass(joinClassName), Model._getClass(model), klass)
 

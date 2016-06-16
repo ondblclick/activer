@@ -21,7 +21,9 @@ class Relation
     new Collection(obj, relationClass)
 
   @manyToMany: (instance, joinClass, relationClass, selfClass) ->
-    ids = instance["#{utils.dfl(joinClass.name)}s"]().map((obj) -> obj["#{utils.dfl(relationClass.name)}Id"])
+    obj = {}
+    obj["#{utils.dfl(instance.constructor.name)}Id"] = instance.id
+    ids = joinClass.dao().getAll(obj).map((obj) -> obj["#{utils.dfl(relationClass.name)}Id"])
     new ManyToManyCollection(
       { id: ids },
       relationClass,
