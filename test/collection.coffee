@@ -156,9 +156,15 @@ describe 'ManyToManyCollection', ->
         expect(tag.name).to.eq undefined
 
     describe '#deleteAll', ->
+      it 'on relation', ->
+      it 'on relation filtered by #where', ->
 
     describe '#destroyAll', ->
+      it 'on relation', ->
+      it 'on relation filtered by #where', ->
 
     describe '#where', ->
+      it 'works', ->
       it 'works with arrays', ->
+      it 'works without args', ->
       it 'on ManyToManyCollection instance returns ManyToManyCollection instance', ->
