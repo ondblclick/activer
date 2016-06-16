@@ -3,7 +3,7 @@ Collection = require("./collection")
 
 class ManyToManyCollection extends Collection
   constructor: (@params, @model, @origin) ->
-    @push.apply(@, @model.dao().getAll(@params).map(@_build))
+    super
 
   _build: (obj) =>
     @model.build(obj)
