@@ -19,5 +19,6 @@ class ManyToManyCollection extends Collection
     obj["#{utils.dfl(@model.name)}Id"] = newInstance.id
     obj["#{utils.dfl(@origin.model.name)}Id"] = @origin.id
     @origin.joinModel.create(obj)
+    newInstance
 
 module.exports = ManyToManyCollection
