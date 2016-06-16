@@ -142,6 +142,25 @@ describe 'Model', ->
         author = post.createAuthor()
         expect(author.post()).to.deep.eq post
 
+      describe "{ dependent: 'destroy' }", ->
+        it 'OK if #destroy', ->
+          post = Post.create()
+          author = post.createAuthor()
+          expect(Post.all().length).to.eq 1
+          expect(Author.all().length).to.eq 1
+          author.destroy()
+          expect(Post.all().length).to.eq 0
+          expect(Author.all().length).to.eq 0
+
+        it 'OK if #remove', ->
+          post = Post.create()
+          author = post.createAuthor()
+          expect(Post.all().length).to.eq 1
+          expect(Author.all().length).to.eq 1
+          author.remove()
+          expect(Post.all().length).to.eq 1
+          expect(Author.all().length).to.eq 0
+
   describe 'static', ->
     describe '#attributes', ->
       it 'returns a set of fields if no arguments passed', ->
