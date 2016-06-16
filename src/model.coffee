@@ -97,7 +97,9 @@ class Model
   @build: (props = {}) ->
     instance = new @()
     Object.keys(props).forEach (prop) =>
-      instance[prop] = props[prop] if prop in @attributes() and !Array.isArray(props[prop])
+      return unless prop in @attributes()
+      return if Array.isArray(props[prop])
+      instance[prop] = props[prop]
     instance
 
   @create: (props = {}) ->
@@ -151,10 +153,10 @@ class Model
     @constructor._getRelationsToBeDeleted().forEach (relation) =>
       if relation.type is 'hasMany'
         @["#{utils.dfl(relation.name)}s"]().destroyAll()
-      if relation.type is 'hasOne' or relation.type is 'belongsTo'
+      if relation.type in ['hasOne', 'belongsTo']
         @[utils.dfl(relation.name)]().destroy()
 
-    # removing join table
+    # removing join table records
     for key, value of @constructor._relations
       return unless value.type is 'hasMany'
       if value.options and value.options.through
