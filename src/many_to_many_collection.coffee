@@ -8,7 +8,7 @@ class ManyToManyCollection extends Collection
   _build: (obj) =>
     @model.build(obj)
 
-  where: (props = {}) =>
+  where: (props = {}) ->
     newParams = utils.extend(props, @params)
     new ManyToManyCollection(newParams, @model, @origin)
 

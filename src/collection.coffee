@@ -10,7 +10,7 @@ class Collection extends Array
   _destroy: (obj) ->
     obj.destroy()
 
-  create: (props = {}) =>
+  create: (props = {}) ->
     newParams = utils.extend(props, @params)
     @model.create(newParams)
 
@@ -20,7 +20,7 @@ class Collection extends Array
   destroyAll: =>
     @model.dao().getAll(@params).map(@_build).map(@_destroy)
 
-  where: (props = {}) =>
+  where: (props = {}) ->
     newParams = utils.extend(props, @params)
     new Collection(newParams, @model)
 
