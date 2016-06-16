@@ -8,6 +8,7 @@ class Post extends Model
   @attributes('name', 'description')
   @hasOne('Author', { dependent: 'destroy' })
   @hasMany('Comment')
+  @hasMany('CategoryPost')
   @hasMany('Category', { through: 'CategoryPost', dependent: 'destroy' })
   @hasAndBelongsToMany('Tag')
 

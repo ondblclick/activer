@@ -88,6 +88,7 @@ import CategoryPost from './category_post';
 class Post extends Model {}
 
 Post.attributes('name', 'description');
+Post.hasMany('CategoryPost');
 Post.hasMany('Category', { through: 'CategoryPost' });
 
 export default Post
@@ -102,6 +103,7 @@ import CategoryPost from './category_post';
 class Category extends Model {}
 
 Category.attributes('name');
+Category.hasMany('CategoryPost');
 Category.hasMany('Post', { through: 'CategoryPost' });
 
 export default Category
