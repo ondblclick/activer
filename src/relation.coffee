@@ -22,7 +22,7 @@ class Relation
 
   @manyToMany: (instance, joinClass, relationClass, selfClass) ->
     obj = {}
-    obj["#{utils.dfl(instance.constructor.name)}Id"] = instance.id
+    obj["#{utils.dfl(selfClass.name)}Id"] = instance.id
     ids = joinClass.dao().getAll(obj).map((obj) -> obj["#{utils.dfl(relationClass.name)}Id"])
     new ManyToManyCollection(
       { id: ids },
