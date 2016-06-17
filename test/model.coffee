@@ -1,6 +1,10 @@
 Author = require("./author")
 Comment = require("./comment")
 Post = require("./post")
+Tag = require("./tag")
+Category = require("./category")
+PostTag = require("./post_tag")
+CategoryPost = require("./category_post")
 expect = require('chai').expect
 
 describe 'Model', ->
@@ -8,119 +12,263 @@ describe 'Model', ->
     Post.deleteAll()
     Comment.deleteAll()
     Author.deleteAll()
+    Category.deleteAll()
+    CategoryPost.deleteAll()
 
-  describe 'adds properties', ->
-    it 'for class with belongsTo method implemented', ->
-      post = Post.create()
-      author1 = Author.create({ postId: post.id })
-      expect(author1.post()).to.eql post
-      author2 = Author.create({ postId: null })
-      expect(author2.post()).to.eql null
+  describe 'relations', ->
+    describe '#hasAndBelongsToMany', ->
+      it 'relation method returns many-to-many collection', ->
+        post = Post.create()
+        tag = Tag.create()
+        expect(post.tags().constructor.name).to.eq 'ManyToManyCollection'
+        expect(tag.posts().constructor.name).to.eq 'ManyToManyCollection'
 
-    it 'for class with hasOne method implemented', ->
-      post1 = Post.create()
-      post2 = Post.create()
-      post3 = Post.create()
-      author1 = Author.create({ postId: post1.id })
-      author2 = post2.createAuthor()
-      expect(post1.author()).to.eql author1
-      expect(post2.author()).to.eql author2
-      expect(post3.author()).to.eql null
-      author3 = post2.createAuthor()
-      expect(post2.author()).to.not.eql author2
-      expect(post2.author()).to.eql author3
+      it 'collection contains proper values', ->
+        post = Post.create()
+        tag1 = Tag.create({ name: 'Tag name 1' })
+        tag2 = Tag.create({ name: 'Tag name 2' })
+        tag3 = Tag.create({ name: 'Tag name 3' })
+        PostTag.create({ postId: post.id, tagId: tag1.id })
+        PostTag.create({ postId: post.id, tagId: tag2.id })
+        PostTag.create({ postId: post.id, tagId: tag3.id })
+        expect(post.tags().length).to.eq 3
+        expect(post.tags()[0]).to.deep.eq tag1
+        expect(tag1.posts().length).to.eq 1
+        expect(tag1.posts()[0]).to.deep.eq post
 
-    it 'for class with hasMany method implemented', ->
-      post = Post.create()
-      expect(post.comments().length).to.eq 0
-      comment1 = Comment.create({ postId: post.id })
-      comment2 = Comment.create({ postId: post.id })
-      comment3 = Comment.create()
-      expect(Comment.all().length).to.eql 3
-      expect(post.comments().length).to.eql 2
-      expect(post.comments()[0]).to.eql comment1
-      expect(post.comments()[1]).to.eql comment2
+    describe '#hasMany', ->
+      it 'relation method returns one-to-many collection', ->
+        post = Post.create()
+        expect(post.comments().constructor.name).to.eq 'Collection'
 
-  it '#toJSON', ->
-    post = Post.create({ name: 'name', description: 'description' })
-    expect(post.toJSON()).to.eql
-      name: 'name'
-      description: 'description'
-      id: post.id
+      it 'collection contains proper values', ->
+        post = Post.create()
+        comment1 = Comment.create({ postId: post.id })
+        comment2 = Comment.create({ postId: post.id })
+        comment3 = Comment.create({ postId: post.id })
+        expect(post.comments().length).to.eq 3
+        expect(post.comments()[0]).to.deep.eq comment1
 
-  it '#save', ->
-    post = Post.create()
-    expect(post.name).to.eql undefined
-    expect(Post.find(post.id).name).to.eql undefined
-    post.name = 'postName'
-    expect(post.name).to.eql 'postName'
-    expect(Post.find(post.id).name).to.eql undefined
-    post.save()
-    expect(post.name).to.eql 'postName'
-    expect(Post.find(post.id).name).to.eql 'postName'
+      describe "{ dependent: 'destroy' }", ->
+        it 'OK if #destroy', ->
+          post = Post.create()
+          post.categorys().create()
+          post.categorys().create()
+          post.categorys().create()
+          expect(Post.all().length).to.eq 1
+          expect(Category.all().length).to.eq 3
+          expect(CategoryPost.all().length).to.eq 3
+          post.destroy()
+          expect(Post.all().length).to.eq 0
+          expect(Category.all().length).to.eq 0
+          expect(CategoryPost.all().length).to.eq 0
 
-  it '#update', ->
-    post = Post.create()
-    expect(post.name).to.eql undefined
-    expect(Post.find(post.id).name).to.eql undefined
-    post.update({ name: 'postName' })
-    expect(post.name).to.eql 'postName'
-    expect(Post.find(post.id).name).to.eql 'postName'
+        it 'OK if #remove', ->
+          post = Post.create()
+          post.categorys().create()
+          post.categorys().create()
+          post.categorys().create()
+          expect(Post.all().length).to.eq 1
+          expect(Category.all().length).to.eq 3
+          expect(CategoryPost.all().length).to.eq 3
+          post.remove()
+          expect(Post.all().length).to.eq 0
+          expect(Category.all().length).to.eq 3
+          expect(CategoryPost.all().length).to.eq 3
 
-  it '#remove', ->
+      describe "{ through: 'something' }", ->
+        it 'relation method returns many-to-many collection', ->
+          post = Post.create()
+          category = Category.create()
+          expect(post.categorys().constructor.name).to.eq 'ManyToManyCollection'
+          expect(category.posts().constructor.name).to.eq 'ManyToManyCollection'
 
-  it '#destroy', ->
+        it 'collection contains proper values', ->
+          post = Post.create()
+          category1 = Category.create({ name: 'Category name 1' })
+          category2 = Category.create({ name: 'Category name 2' })
+          category3 = Category.create({ name: 'Category name 3' })
+          CategoryPost.create({ postId: post.id, categoryId: category1.id })
+          CategoryPost.create({ postId: post.id, categoryId: category2.id })
+          CategoryPost.create({ postId: post.id, categoryId: category3.id })
+          expect(post.categorys().length).to.eq 3
+          expect(post.categorys()[0]).to.deep.eq category1
+          expect(category1.posts().length).to.eq 1
+          expect(category1.posts()[0]).to.deep.eq post
 
-  describe 'adds useful static method', ->
-    it '#all', ->
-      [1..10].forEach -> Post.create()
-      expect(Post.all().length).to.eql 10
-      expect(Post.all().constructor.name).to.eql 'Collection'
+    describe '#hasOne', ->
+      it 'relation method returns model instance', ->
+        post = Post.create()
+        author = Author.create({ postId: post.id })
+        expect(post.author().constructor.name).to.eq 'Author'
 
-    it '#find', ->
-      [1..10].forEach (index) -> Post.create({ id: index })
-      expect(Post.find(1)).to.not.eql undefined
-      expect(Post.find(15)).to.eql undefined
+      it 'instance has method to create relation', ->
+        post = Post.create()
+        expect(post.createAuthor).to.not.eq undefined
+        expect(post.createAuthor().postId).to.eq post.id
 
-    it '#where', ->
-      [1..10].forEach (index) -> Post.create({ id: index })
-      expect(Post.where({ id: 1 }).length).to.eql 1
-      expect(Post.where({ id: 20 }).length).to.eql 0
-      expect(Post.where({ id: 20 }).constructor.name).to.eql 'Collection'
+      it 'relations is a proper object', ->
+        post = Post.create()
+        author = post.createAuthor()
+        expect(post.author()).to.deep.eq author
 
-    it '#create', ->
-      expect(Post.all().length).to.eql 0
-      post = Post.create()
-      expect(Post.all().length).to.eql 1
-      expect(Post.all()[0]).to.eql post
+      describe "{ dependent: 'destroy' }", ->
+        it 'OK if #destroy', ->
+          post = Post.create()
+          author = post.createAuthor()
+          expect(Post.all().length).to.eq 1
+          expect(Author.all().length).to.eq 1
+          post.destroy()
+          expect(Post.all().length).to.eq 0
+          expect(Author.all().length).to.eq 0
 
-    it '#deleteAll (not triggering callbacks)', ->
-      post1 = Post.create()
-      post2 = Post.create()
-      author1 = post1.createAuthor()
-      author2 = post2.createAuthor()
-      expect(Post.all().length).to.eq 2
-      expect(Author.all().length).to.eq 2
-      Post.deleteAll()
-      expect(Post.all().length).to.eq 0
-      expect(Author.all().length).to.eq 2
+        it 'OK if #remove', ->
+          post = Post.create()
+          author = post.createAuthor()
+          expect(Post.all().length).to.eq 1
+          expect(Author.all().length).to.eq 1
+          post.remove()
+          expect(Post.all().length).to.eq 0
+          expect(Author.all().length).to.eq 1
 
-    it '#destroyAll (triggering callbacks)', ->
-      post1 = Post.create()
-      post2 = Post.create()
-      author1 = post1.createAuthor()
-      author2 = post2.createAuthor()
-      expect(Post.all().length).to.eq 2
-      expect(Author.all().length).to.eq 2
-      Post.destroyAll()
-      expect(Post.all().length).to.eq 0
-      expect(Author.all().length).to.eq 0
+    describe '#belongsTo', ->
+      it 'relation method returns model instance', ->
+        post = Post.create()
+        author = Author.create({ postId: post.id })
+        expect(author.post().constructor.name).to.eq 'Post'
 
-    it '#delegate', ->
-      post = Post.create()
-      expect(post.saySomething('something')).to.eql 'something'
-      author = post.createAuthor()
-      expect(author.saySomething('another thing')).to.eql 'another thing'
-      expect(author.comments().length).to.eql 0
-      post.comments().create()
-      expect(author.comments().length).to.eql 1
+      it 'relations is a proper object', ->
+        post = Post.create()
+        author = post.createAuthor()
+        expect(author.post()).to.deep.eq post
+
+      describe "{ dependent: 'destroy' }", ->
+        it 'OK if #destroy', ->
+          post = Post.create()
+          author = post.createAuthor()
+          expect(Post.all().length).to.eq 1
+          expect(Author.all().length).to.eq 1
+          author.destroy()
+          expect(Post.all().length).to.eq 0
+          expect(Author.all().length).to.eq 0
+
+        it 'OK if #remove', ->
+          post = Post.create()
+          author = post.createAuthor()
+          expect(Post.all().length).to.eq 1
+          expect(Author.all().length).to.eq 1
+          author.remove()
+          expect(Post.all().length).to.eq 1
+          expect(Author.all().length).to.eq 0
+
+  describe 'static', ->
+    describe '#attributes', ->
+      it 'returns a set of fields if no arguments passed', ->
+        expect(Post.attributes()).to.deep.eq ['id', 'name', 'description']
+
+      it 'adds a field to a set if arguments passed', ->
+        Post.attributes('something')
+        expect(Post.attributes()).to.deep.eq ['id', 'name', 'description', 'something']
+
+    describe '#delegate', ->
+      it 'works', ->
+        post = Post.create()
+        expect(post.saySomething('something')).to.eql 'something'
+        author = post.createAuthor()
+        expect(author.saySomething('another thing')).to.eql 'another thing'
+        expect(author.comments().length).to.eql 0
+        post.comments().create()
+        expect(author.comments().length).to.eql 1
+
+    describe '#create', ->
+      it 'works', ->
+        expect(Post.all().length).to.eql 0
+        post = Post.create()
+        expect(Post.all().length).to.eql 1
+        expect(Post.all()[0]).to.eql post
+
+    describe '#build', ->
+      it 'works', ->
+        post = Post.build()
+        expect(Post.all().length).to.eq 0
+        expect(post.constructor.name).to.eq 'Post'
+
+    describe '#find', ->
+      beforeEach ->
+        [1..10].forEach (index) -> Post.create({ id: index })
+
+      it 'returns a model instance', ->
+        expect(Post.find(1).constructor.name).to.eq 'Post'
+
+      it 'returns proper object if all OK', ->
+        expect(Post.find(1)).to.not.eql undefined
+
+      it 'return undefined if no object was found', ->
+        expect(Post.find(15)).to.eql undefined
+
+    describe '#all', ->
+      it 'returns collection instance', ->
+        post = Post.create()
+        expect(Post.all().constructor.name).to.eq 'Collection'
+
+    describe '#where', ->
+      it 'returns collection instance', ->
+        post = Post.create()
+        expect(Post.where().constructor.name).to.eq 'Collection'
+
+  describe 'instance', ->
+    describe '#destroy', ->
+      it 'triggers dependent: destroy', ->
+        post = Post.create()
+        author = post.createAuthor()
+        expect(Post.all().length).to.eq 1
+        expect(Author.all().length).to.eq 1
+        post.destroy()
+        expect(Post.all().length).to.eq 0
+        expect(Author.all().length).to.eq 0
+
+      it 'triggers afterDestroy callback', ->
+        # pending
+
+    describe '#remove', ->
+      it 'not triggers dependent: destroy', ->
+        post = Post.create()
+        author = post.createAuthor()
+        expect(Post.all().length).to.eq 1
+        expect(Author.all().length).to.eq 1
+        post.remove()
+        expect(Post.all().length).to.eq 0
+        expect(Author.all().length).to.eq 1
+
+      it 'not triggers afterDestroy callback', ->
+        # pending
+
+    describe '#save', ->
+      it 'works', ->
+        post = Post.create()
+        expect(post.name).to.eql undefined
+        expect(Post.find(post.id).name).to.eql undefined
+        post.name = 'postName'
+        expect(post.name).to.eql 'postName'
+        expect(Post.find(post.id).name).to.eql undefined
+        post.save()
+        expect(post.name).to.eql 'postName'
+        expect(Post.find(post.id).name).to.eql 'postName'
+
+    describe '#update', ->
+      it 'works', ->
+        post = Post.create()
+        expect(post.name).to.eql undefined
+        expect(Post.find(post.id).name).to.eql undefined
+        post.update({ name: 'postName' })
+        expect(post.name).to.eql 'postName'
+        expect(Post.find(post.id).name).to.eql 'postName'
+
+    describe '#toJSON', ->
+      it 'works', ->
+        Post._fields = ['id', 'name', 'description']
+        post = Post.create({ name: 'name', description: 'description' })
+        expect(post.toJSON()).to.eql
+          name: 'name'
+          description: 'description'
+          id: post.id

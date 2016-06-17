@@ -1,9 +1,13 @@
 Collection = require("./collection")
+Relation = require('./relation')
 utils = require("./utils")
 dao = require("./dao")
 
 class Model
   @_constructors: {}
+
+  @_getClass: (name) ->
+    Model._constructors[name]
 
   @_addToConstructorsList: (constructor) ->
     Model._constructors[constructor.name] = constructor
@@ -30,44 +34,50 @@ class Model
     @attributes("#{utils.dfl(model)}Id")
 
     @::[utils.dfl(model)] = ->
-      relationClass = Model._constructors[model]
-      record = relationClass.dao().get(@["#{utils.dfl(model)}Id"])
-      return null unless record
-      relationClass.build(record)
+      Relation.belongsTo(@, Model._getClass(model))
 
   @hasOne: (model, options) ->
     @_addToConstructorsList(@)
     @_addToRelationsList(model, options, 'hasOne')
 
     @::[utils.dfl(model)] = ->
-      relationClass = Model._constructors[model]
-      obj = {}
-      obj["#{utils.dfl(@constructor.name)}Id"] = @id
-      record = relationClass.dao().getAll(obj)[0]
-      return null unless record
-      relationClass.build(record)
+      Relation.hasOne(@, Model._getClass(model))
 
     @::["create#{model}"] = (props = {}) ->
       obj = {}
       obj["#{utils.dfl(@constructor.name)}Id"] = @id
-      relationClass = Model._constructors[model]
 
       # check if relation is already there and remove it
-      record = relationClass.dao().getAll(obj)[0]
-      relationClass.dao().remove(record.id) if record
+      record = Model._getClass(model).dao().getAll(obj)[0]
+      Model._getClass(model).dao().remove(record.id) if record
 
       # create new relation
-      relationClass.create(utils.extend(props, obj))
+      Model._getClass(model).create(utils.extend(props, obj))
 
   @hasMany: (model, options) ->
     @_addToConstructorsList(@)
     @_addToRelationsList(model, options, 'hasMany')
 
+    if options and options.through
+      joinClassName = options.through
+      klass = @
+
+      @::["#{utils.dfl(model)}s"] = ->
+        Relation.manyToMany(@, Model._getClass(joinClassName), Model._getClass(model), klass)
+
+    else
+      @::["#{utils.dfl(model)}s"] = ->
+        Relation.hasMany(@, Model._getClass(model))
+
+  @hasAndBelongsToMany: (model, options) ->
+    @_addToConstructorsList(@)
+    @_addToRelationsList(model, options, 'hasAndBelongsToMany')
+
+    joinClassName = [model, @name].sort().join('')
+    klass = @
+
     @::["#{utils.dfl(model)}s"] = ->
-      relationClass = Model._constructors[model]
-      obj = {}
-      obj["#{utils.dfl(@constructor.name)}Id"] = @id
-      new Collection(obj, relationClass, relationClass.dao().getAll(obj))
+      Relation.manyToMany(@, Model._getClass(joinClassName), Model._getClass(model), klass)
 
   @attributes: (attributes...) ->
     if attributes.length
@@ -77,11 +87,14 @@ class Model
         @_fields = utils.uniq(@_fields)
     else
       @_fields or ['id']
+    @_fields
 
   @build: (props = {}) ->
     instance = new @()
     Object.keys(props).forEach (prop) =>
-      instance[prop] = props[prop] if prop in @attributes()
+      return unless prop in @attributes()
+      return if Array.isArray(props[prop])
+      instance[prop] = props[prop]
     instance
 
   @create: (props = {}) ->
@@ -92,17 +105,19 @@ class Model
     instance
 
   @all: ->
-    new Collection({}, @, @dao().getAll())
+    new Collection({}, @)
 
   @find: (id) ->
-    return unless @dao().get(id)
-    @build(@dao().get(id))
+    new Collection({}, @).find(id)
 
   @where: (props = {}) ->
-    new Collection(props, @, @dao().getAll(props))
+    new Collection(props, @)
 
-  @deleteAll: -> @dao().removeAll()
-  @destroyAll: -> @all().forEach((obj) -> obj.destroy())
+  @deleteAll: ->
+    new Collection({}, @).deleteAll()
+
+  @destroyAll: ->
+    new Collection({}, @).destroyAll()
 
   @collection: (@externalDao) ->
 
@@ -128,11 +143,23 @@ class Model
   destroy: ->
     @remove()
 
+    # remove all dependent: destroy relations
     @constructor._getRelationsToBeDeleted().forEach (relation) =>
       if relation.type is 'hasMany'
-        @["#{utils.dfl(relation.name)}s"]().deleteAll()
-      if relation.type is 'hasOne' or relation.type is 'belongsTo'
-        @[utils.dfl(relation.name)]().destroy()
+        @["#{utils.dfl(relation.name)}s"]().destroyAll()
+      if relation.type in ['hasOne', 'belongsTo']
+        @[utils.dfl(relation.name)]().destroy() if @[utils.dfl(relation.name)]()
+
+    # remove join table records
+    for key, value of @constructor._relations
+      if value.type is 'hasMany'
+        if value.options and value.options.through
+          @["#{utils.dfl(value.options.through)}s"]().destroyAll()
+      if value.type is 'hasAndBelongsToMany'
+        joinClassName = [@constructor.name, key].sort().join('')
+        obj = {}
+        obj["#{utils.dfl(@constructor.name)}Id"] = @id
+        Model._getClass(joinClassName).where(obj).destroyAll()
 
     @afterDestroy()
 

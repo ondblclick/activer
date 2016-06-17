@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/ondblclick/activer.svg?branch=master)](https://travis-ci.org/ondblclick/activer)
 
-Base class for your JavaScript models that adds useful `hasOne`, `hasMany`, `belongsTo`, `attributes` and `delegate` static methods (as well as `save`, `update` and `destroy` instance methods and a few callbacks).
+Base class for your JavaScript models that adds useful `hasOne`, `hasMany`, `belongsTo`, `hasAndBelongsToMany`, `attributes` and `delegate` static methods (as well as `save`, `update` and `destroy` instance methods and a few callbacks).
 
 ## Usage
 
@@ -75,6 +75,100 @@ console.log(user.post()); // undefined
 
 See tests for details.
 
+## hasMany { through: 'SomeClass' }
+
+To be able to use the hasMany through association the join collection model should be implemented. See example below.
+
+in your `post.js`:
+```javascript
+import Model from 'activer';
+import Category from './category';
+import CategoryPost from './category_post';
+
+class Post extends Model {}
+
+Post.attributes('name', 'description');
+Post.hasMany('CategoryPost');
+Post.hasMany('Category', { through: 'CategoryPost' });
+
+export default Post
+```
+
+in your `category.js`:
+```javascript
+import Model from 'activer';
+import Post from './post';
+import CategoryPost from './category_post';
+
+class Category extends Model {}
+
+Category.attributes('name');
+Category.hasMany('CategoryPost');
+Category.hasMany('Post', { through: 'CategoryPost' });
+
+export default Category
+```
+
+in your `category_post.js` (please note class names in the join collection are sorted alphabetically, and they should be):
+```javascript
+import Model from 'activer';
+import Post from './post';
+import Category from './category';
+
+class CategoryPost extends Model {}
+
+CategoryPost.belongsTo('Post');
+CategoryPost.belongsTo('Category');
+
+export default CategoryPost
+```
+
+## HABTM
+
+To be able to use the hasAndBelongsToMany association the join collection model should be implemented. See example below.
+
+in your `post.js`:
+```javascript
+import Model from 'activer';
+import Tag from './tag';
+import PostTag from './post_tag';
+
+class Post extends Model {}
+
+Post.attributes('name', 'description');
+Post.hasAndBelongsToMany('Tag');
+
+export default Post
+```
+
+in your `tag.js`:
+```javascript
+import Model from 'activer';
+import Post from './post';
+import PostTag from './post_tag';
+
+class Tag extends Model {}
+
+Tag.attributes('name');
+Tag.hasAndBelongsToMany('Post');
+
+export default Tag
+```
+
+in your `post_tag.js` (please note class names in the join collection are sorted alphabetically, and they should be):
+```javascript
+import Model from 'activer';
+import Post from './post';
+import Tag from './tag';
+
+class PostTag extends Model {}
+
+PostTag.belongsTo('Post');
+PostTag.belongsTo('Tag');
+
+export default PostTag
+```
+
 ## Store
 
 Activer uses in-memory storage by default but you can specify your own data access object to use whatewer you want using the static `collection` method. DAO should implement some methods:
@@ -98,3 +192,5 @@ See default implementation in `src/dao.coffee`.
 ## Changelog
 
 0.10.0: Model static methods `all` and `where` now return Collection instance. Collection instance method `where` now returns new Collection instance. One can do `User.all().where({ something: 'something' }).where({ anotherThing: 'Another thing' }).deleteAll()` now.
+
+0.11.0: `hasAndBelongsToMany` association implemented. `hasMany { through }` association implemented.

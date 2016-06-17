@@ -1,20 +1,18 @@
 {
   "name": "activer",
-  "version": "0.10.0",
-  "description": "Parent class for creating activerecord-like relations in JavaScript classes.",
+  "version": "0.11.0",
+  "description": "Base class for your JavaScript models that adds useful `hasOne`, `hasMany`, `belongsTo`, `hasAndBelongsToMany`, `attributes` and `delegate` static methods (as well as `save`, `update` and `destroy` instance methods and a few callbacks)",
   "repository": "ondblclick/activer",
   "main": "./dist/model.js",
   "author": "Bohdan Hontarenko",
   "scripts": {
     "clean": "rm -rf dist/*",
     "build": "coffee --compile --output dist src",
-    "watch": "onchange src -- npm test",
     "test": "mocha --compilers coffee:coffee-script/register"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "coffee-script": "^1.10.0",
-    "mocha": "^2.4.5",
-    "onchange": "^2.0.0"
+    "mocha": "^2.4.5"
   }
 }

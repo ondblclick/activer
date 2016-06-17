@@ -1,4 +1,3 @@
-Collection = require('../src/collection')
 Comment = require("./comment")
 Post = require("./post")
 expect = require('chai').expect
@@ -8,69 +7,109 @@ describe 'Collection', ->
     Post.deleteAll()
     Comment.deleteAll()
 
-  describe 'is returned', ->
-    it 'for Model instance #where call', ->
-      post = Post.create()
-      post.comments().create({ body: 'Some comment body' })
-      expect(Comment.where({ body: 'Some comment body' }).constructor.name).to.eql 'Collection'
+  describe 'static', ->
+    describe '#create', ->
+      it 'on relation', ->
+        post = Post.create()
+        comment = post.comments().create()
+        expect(post.comments()[0]).to.deep.eq comment
+        expect(comment.postId).to.eq post.id
 
-    it 'for Model instance #all call', ->
-      post = Post.create()
-      post.comments().create()
-      expect(Comment.all().constructor.name).to.eql 'Collection'
+      it 'on relation filtered by #where (without arrays)', ->
+        post = Post.create()
+        comment1 = post.comments().create({ body: 'somebody' })
+        comment2 = post.comments().create({ body: 'another body' })
+        comment = post.comments().where({ body: 'somebody' }).create()
+        expect(post.comments().length).to.eq 3
+        expect(comment.body).to.eq 'somebody'
 
-    it 'for Collection instance #where call', ->
-      post = Post.create()
-      post.comments().create({ body: 'Some comment body' })
-      expect(post.comments().where({ body: 'Some comment body' }).constructor.name).to.eql 'Collection'
-      expect(Comment.all().where({ body: 'Some comment body' }).constructor.name).to.eql 'Collection'
+      it 'on relation filtered by #where (with arrays)', ->
+        post = Post.create()
+        comment1 = post.comments().create({ body: 'somebody' })
+        comment2 = post.comments().create({ body: 'another body' })
+        comment = post.comments().where({ body: ['somebody', 'another body'] }).create()
+        expect(post.comments().length).to.eq 3
+        expect(comment.body).to.eq undefined
 
-  describe 'returns proper value', ->
-    it 'for hasMany relation', ->
-      post = Post.create()
-      comment1 = post.comments().create()
-      expect(post.comments().length).to.eql 1
-      expect(post.comments()[0]).to.deep.eql comment1
+    describe '#deleteAll', ->
+      it 'on relation', ->
+        post = Post.create()
+        comment1 = post.comments().create({ body: 'somebody' })
+        comment2 = post.comments().create({ body: 'another body' })
+        expect(post.comments().length).to.eq 2
+        post.comments().deleteAll()
+        expect(post.comments().length).to.eq 0
 
-    it 'for #where method called on Model', ->
-      post = Post.create()
-      expect(Post.where({ id: post.id })[0]).to.deep.eql post
+      it 'on relation filtered by #where', ->
+        post = Post.create()
+        comment1 = post.comments().create({ body: 'somebody' })
+        comment2 = post.comments().create({ body: 'somebody' })
+        comment3 = post.comments().create({ body: 'another body' })
+        expect(post.comments().length).to.eq 3
+        post.comments().where({ body: 'somebody' }).deleteAll()
+        expect(post.comments().length).to.eq 1
 
-    it 'for #all method called on Model', ->
-      post = Post.create()
-      expect(Post.all()[0]).to.deep.eql post
+    describe '#destroyAll', ->
+      it 'on relation', ->
+        post = Post.create()
+        comment1 = post.comments().create({ body: 'somebody' })
+        comment2 = post.comments().create({ body: 'another body' })
+        expect(post.comments().length).to.eq 2
+        post.comments().destroyAll()
+        expect(post.comments().length).to.eq 0
 
-    it 'for #where method called on Collection', ->
-      post1 = Post.create({ name: 'Some name', description: 'Some description' })
-      post2 = Post.create({ name: 'Another name', description: 'Some description' })
-      expect(Post.where({ description: 'Some description' }).length).to.eql 2
-      expect(Post.where({ description: 'Some description' }).where({ name: 'Some name' }).length).to.eql 1
-      expect(Post.where({ description: 'Some description' }).where({ name: 'Some name' })[0]).to.deep.eql post1
-      expect(Post.all().length).to.eql 2
-      expect(Post.all().where({ description: 'Some description' }).where({ name: 'Some name' }).length).to.eql 1
-      expect(Post.all().where({ description: 'Some description' }).where({ name: 'Some name' })[0]).to.deep.eql post1
-      expect(Post.all().where().where().where().length).to.eql 2
+      it 'on relation filtered by #where', ->
+        post = Post.create()
+        comment1 = post.comments().create({ body: 'somebody' })
+        comment2 = post.comments().create({ body: 'somebody' })
+        comment3 = post.comments().create({ body: 'another body' })
+        expect(post.comments().length).to.eq 3
+        post.comments().where({ body: 'somebody' }).destroyAll()
+        expect(post.comments().length).to.eq 1
 
-  describe 'has method', ->
-    it '#create', ->
-      post = Post.create()
-      expect(post.comments().length).to.eql 0
-      post.comments().create()
-      expect(post.comments().length).to.eql 1
+    describe '#where', ->
+      it 'works', ->
+        post = Post.create()
+        comment1 = post.comments().create({ body: 'somebody' })
+        comment2 = post.comments().create({ body: 'somebody' })
+        comment3 = post.comments().create({ body: 'another body' })
+        expect(post.comments().where({ body: 'somebody' }).length).to.eq 2
 
-    it '#deleteAll', ->
-      post = Post.create()
-      post.comments().create({ id: 1 })
-      expect(post.comments().length).to.eql 1
-      post.comments().deleteAll()
-      expect(post.comments().length).to.eql 0
+      it 'works with arrays', ->
+        post = Post.create()
+        comment1 = post.comments().create({ body: 'somebody' })
+        comment2 = post.comments().create({ body: 'third body' })
+        comment3 = post.comments().create({ body: 'another body' })
+        expect(post.comments().where({ body: ['somebody', 'third body'] }).length).to.eq 2
 
-    it '#where', ->
-      post = Post.create()
-      comment = post.comments().create({ id: 1 })
-      expect(post.comments().where({ id: 1 }).length).to.eql 1
+      it 'works without args', ->
+        post = Post.create()
+        comment1 = post.comments().create({ body: 'somebody' })
+        comment2 = post.comments().create({ body: 'third body' })
+        comment3 = post.comments().create({ body: 'another body' })
+        expect(post.comments().where().length).to.eq post.comments().length
 
-    it '#find', ->
-      post = Post.create()
-      comment = post.comments().create({ id: 1 })
-      expect(post.comments().find(1)).to.deep.eql comment
+      it 'on Model returns Collection instance', ->
+        post = Post.create()
+        comment1 = post.comments().create({ body: 'somebody' })
+        comment2 = post.comments().create({ body: 'third body' })
+        comment3 = post.comments().create({ body: 'another body' })
+        expect(Comment.where().constructor.name).to.eq 'Collection'
+
+      it 'on Collection instance returns Collection instance', ->
+        post = Post.create()
+        comment1 = post.comments().create({ body: 'somebody' })
+        comment2 = post.comments().create({ body: 'third body' })
+        comment3 = post.comments().create({ body: 'another body' })
+        expect(post.comments().where().constructor.name).to.eq 'Collection'
+
+    describe '#find', ->
+      it 'works if OK', ->
+        post = Post.create()
+        [1..10].forEach (index) -> post.comments().create({ id: index })
+        expect(post.comments().find(5)).to.not.eq undefined
+
+      it 'returns undefined if not OK', ->
+        post = Post.create()
+        [1..10].forEach (index) -> post.comments().create({ id: index })
+        expect(post.comments().find(15)).to.eq undefined
