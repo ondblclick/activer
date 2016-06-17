@@ -59,10 +59,22 @@ in your `main.js`:
 import User from './user';
 import Comment from './comment';
 
-var user = User.create({ name: "User name", description: "User description" });
-var post = user.createPost({ name: "Post name", description: "Post description" });
-var comment1 = post.comments().create({ name: "Comment 1 name", description: "Comment 1 description" });
-var comment2 = post.comments().create({ name: "Comment 2 name", description: "Comment 2 description" });
+var user = User.create({
+  name: "User name",
+  description: "User description"
+});
+var post = user.createPost({
+  name: "Post name",
+  description: "Post description"
+});
+var comment1 = post.comments().create({
+  name: "Comment 1 name",
+  description: "Comment 1 description"
+});
+var comment2 = post.comments().create({
+  name: "Comment 2 name",
+  description: "Comment 2 description"
+});
 
 user.saySomething(); // 'Post'
 console.log(user.post().comments().length); // 2

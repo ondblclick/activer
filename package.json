@@ -5,6 +5,7 @@
   "repository": "ondblclick/activer",
   "main": "./dist/model.js",
   "author": "Bohdan Hontarenko",
+  "tonicExampleFilename": "./example/example.js",
   "scripts": {
     "clean": "rm -rf dist/*",
     "build": "coffee --compile --output dist src",
