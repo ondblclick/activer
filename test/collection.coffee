@@ -195,7 +195,7 @@ describe 'ManyToManyCollection', ->
           expect(PostTag.all().length).to.eq 3
           post.tags().destroyAll()
           expect(post.tags().length).to.eq 0
-          expect(PostTag.all().length).to.eq 3
+          expect(PostTag.all().length).to.eq 0
 
         it 'on relation filtered by #where', ->
           PostTag.deleteAll()
@@ -207,7 +207,7 @@ describe 'ManyToManyCollection', ->
           expect(PostTag.all().length).to.eq 3
           post.tags().where({ name: ['tag 1', 'tag 2'] }).destroyAll()
           expect(post.tags().length).to.eq 1
-          expect(PostTag.all().length).to.eq 3
+          expect(PostTag.all().length).to.eq 1
 
       describe '#hasMany { through }', ->
         # hasMany { through } relation triggering callbacks

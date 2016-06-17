@@ -152,9 +152,14 @@ class Model
 
     # remove join table records
     for key, value of @constructor._relations
-      return unless value.type is 'hasMany'
-      if value.options and value.options.through
-        @["#{utils.dfl(value.options.through)}s"]().destroyAll()
+      if value.type is 'hasMany'
+        if value.options and value.options.through
+          @["#{utils.dfl(value.options.through)}s"]().destroyAll()
+      if value.type is 'hasAndBelongsToMany'
+        joinClassName = [@constructor.name, key].sort().join('')
+        obj = {}
+        obj["#{utils.dfl(@constructor.name)}Id"] = @id
+        Model._getClass(joinClassName).where(obj).destroyAll()
 
     @afterDestroy()
 
