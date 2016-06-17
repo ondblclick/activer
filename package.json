@@ -1,6 +1,6 @@
 {
   "name": "activer",
-  "version": "0.11.1",
+  "version": "0.11.2",
   "description": "Base class for your JavaScript models that adds useful 'hasOne', 'hasMany', 'belongsTo', 'hasAndBelongsToMany', 'attributes' and 'delegate' static methods (as well as 'save', 'update' and 'destroy' instance methods and a few callbacks)",
   "repository": "ondblclick/activer",
   "main": "./dist/model.js",
