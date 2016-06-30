@@ -169,4 +169,7 @@ class Model
       res[field] = @[field]
     res
 
-module.exports = Model
+if typeof window isnt 'undefined'
+  window.Model = Model
+else
+  module.exports = Model

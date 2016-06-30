@@ -7,11 +7,14 @@
   "author": "Bohdan Hontarenko",
   "tonicExampleFilename": "./example/example.js",
   "scripts": {
-    "clean": "rm -rf dist/*",
-    "build": "coffee --compile --output dist src",
-    "test": "mocha --compilers coffee:coffee-script/register"
+    "prepublish": "npm run build",
+    "test": "mocha --compilers coffee:coffee-script/register",
+    "build": "npm run _build:compile && npm run _build:browser",
+    "_build:compile": "coffee --compile --output dist src",
+    "_build:browser": "browserify dist/model.js > activer.js"
   },
   "devDependencies": {
+    "browserify": "^13.0.1",
     "chai": "^3.5.0",
     "coffee-script": "^1.10.0",
     "mocha": "^2.4.5"

@@ -1,3 +1,4 @@
 node_modules
 coffeelint.json
 .travis.yml
+.activer.js
