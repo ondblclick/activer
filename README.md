@@ -203,7 +203,7 @@ See default implementation in `src/dao.coffee`.
 
 ## Browser
 
-To be able to use activer in browser include activer.js file from the root to the page:
+To be able to use activer in the browser include activer.js (can be found in the root of this repository) to the page:
 
 ```html
 <script src="./activer.js" type="text/javascript"></script>
