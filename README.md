@@ -201,6 +201,14 @@ User.collection(dataAccessObject)
 
 See default implementation in `src/dao.coffee`.
 
+## Browser
+
+To be able to use activer in browser include activer.js file from the root to the page:
+
+```html
+<script src="./activer.js" type="text/javascript"></script>
+```
+
 ## Changelog
 
 0.10.0: Model static methods `all` and `where` now return Collection instance. Collection instance method `where` now returns new Collection instance. One can do `User.all().where({ something: 'something' }).where({ anotherThing: 'Another thing' }).deleteAll()` now.
